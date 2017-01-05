@@ -1,0 +1,10 @@
+base referer
+rect $classRightPart.html 18,175 82,198
+rect $classConcatRightPart.html 155,7 262,31
+rect $classEmptyRightPart.html 158,55 259,79
+rect $classKleeneClosureRightPart.html 134,103 283,127
+rect $classNonTerminalRightPart.html 140,151 278,175
+rect $classOptionRightPart.html 157,198 261,222
+rect $classPositiveClosureRightPart.html 132,246 286,270
+rect $classTerminalRightPart.html 152,294 266,318
+rect $classUnionRightPart.html 159,342 258,366

@@ -1,0 +1,5 @@
+base referer
+rect $classCalcLevelsVisitor.html 6,261 148,512
+rect $classHalsteadVisitor.html 172,261 313,512
+rect $classMcCabeVisitor.html 337,276 478,497
+rect $classSizeVisitor.html 502,276 644,497

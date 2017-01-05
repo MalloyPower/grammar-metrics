@@ -1,0 +1,1551 @@
+/*** Essential Lahey Fortran 90 Syntax 
+ *** Source: http://www.lahey.com/elf_sntx.htm
+ *** The following text (syntax rules for Essential Lahey Fortran 90) 
+ *** are derived from the electronic
+ *** version of the Fortran 90 standard, Appendix D.
+ *** 
+ *** The following changes have been made to the Appendix D text:
+ *** 
+ ***   Lines have been reformatted so as to have at most 75 characters
+ ***   plus end of line.
+ *** 
+ ***   Where needed text was realigned.  In rearranging the text, page
+ ***   numbers and printed line-numbers agree with the printed version
+ ***   of the standard, not the electronic version.  Sometimes, the blank
+ ***   lines within consecutively numbered lines were collected at the
+ ***   end of the block.
+ *** 
+ ***   Blank lines were not numbered in Appendix D and are not here.  In
+ ***   this document, when a blank line is numbered, it means that Appendix
+ ***   D text was deleted because Essential LF90 does not allow the 
+ ***   syntax or that a constraint is not applicable.
+ ***
+ ***   A line without a line number but with text indicates an Essential LF90
+ ***   requirement that was optional in the standard, e.g., IMPLICIT NONE.
+
+ ***   Unneeded syntax rules (see 507 which could be folded into 506) were
+ ***   not eliminated in order to preserve a higher isomorphism to the text
+ ***   in the standard.
+ ***
+ ***   The constraint at Page 312 appears in the electronic version, not
+ ***   the printed version.
+ ***   
+ ***   To reduce the length of long lines, the following substitutions were 
+ ***   made within the syntax rules:
+ *** 
+ ***             literal        was replaced with lit
+ ***             exponent       was replaced with xpn
+ ***             initialization was replaced with initz
+ ***
+ *** In Essential LF90, the concept of BOZ values (but not the Fortran 
+ *** 90 syntax) exists in input/output but, because the DATA statement
+ *** has been removed, there is no place in the source language 
+ *** BOZ constants may appear.
+ ***/
+
+/***
+ *** As did Appendix D, these syntax rules contains two parts.  The
+ *** first part is an extraction of all syntax rules and constraints
+ *** in the order in which they appear in the standard.  The second
+ *** part is a cross reference with an entry for each terminal symbol
+ *** and each nonterminal symbol in the syntax rules.  The symbols are
+ *** sorted alphabetically within three categories: nonterminal symbols
+ *** that are defined, nonterminal symbols that are not defined, and
+ *** terminal symbols.
+ ***
+ *** Except for those ending with -name, the only undefined nonterminal
+ *** symbols are letter, digit, special-character, and rep-char.  As
+ *** described in 1.5.2, the following rules are assumed.  The letters
+ *** "xyz" stand for any legal syntactic class phrase:
+ ***
+ ***         xyz-list                    is  xyz [ , xyz ] ...
+ ***
+ ***         xyz-name                    is  name
+ ***
+ ***         scalar-xyz                  is  xyz
+ ***
+ *** Constraint   scalar-xyz must be scalar.
+ ***/
+
+/*  D.1  Syntax Rules and Constraints.  Each of the following sections
+ *    contains the syntax rules and constraints from one section of the
+ *    standard; that is, Section D.1.1 contains the rules and constraints
+ *    from Section 1 of the standard, D.1.2 contains those from Section 2,
+ *    and so on.  Note that Sections 1, 13, and 14 contain no syntax rules.
+ */
+
+
+/*** D.1.1  Overview ***/
+
+/*** D.1.2  Fortran Terms and Concepts. ***/
+
+
+/* R201 */
+executable-program
+  : program-unit {  program-unit  }
+  ;
+/* R202 */
+program-unit
+  : main-program
+  | external-subprogram
+  | module
+  ;
+/* R1101 */
+main-program
+  : program-stmt
+    [ specification-part ]
+    [ execution-part ]
+    [ internal-subprogram-part ]
+    end-program-stmt
+  ;
+/* R203 */
+external-subprogram
+  : function-subprogram
+  |  subroutine-subprogram
+  ;
+/* R1215 */
+function-subprogram
+  : function-stmt
+    [ specification-part ]
+    [ execution-part ]
+    [ internal-subprogram-part ]
+    end-function-stmt
+  ;
+/* Page 303 */
+/* R1219 */
+subroutine-subprogram
+  : subroutine-stmt
+    [ specification-part ]
+    [ execution-part ]
+    [ internal-subprogram-part ]
+    end-subroutine-stmt
+  ;
+/* R1104 */
+module
+  : module-stmt
+    [ specification-part ]
+    [ module-subprogram-part ]
+    end-module-stmt
+  ;
+/* R204 */
+specification-part         
+  :  { use-stmt }  implicit-part  { declaration-construct }
+  ;
+/* R205 */
+implicit-part
+  : IMPLICIT NONE
+    { implicit-part-stmt }
+  ;
+/* R206 */
+implicit-part-stmt
+  : parameter-stmt
+  |  format-stmt
+  ;
+/* R207 */
+declaration-construct
+  : derived-type-def
+  |  interface-block
+  |  type-declaration-stmt
+  |  specification-stmt
+  |  parameter-stmt
+  |  format-stmt
+  ;
+/* R208 */
+execution-part
+  : executable-construct  {  execution-part-construct  }
+  ;
+/* R209 */
+execution-part-construct
+  : executable-construct
+  |  format-stmt
+  ;
+/* R210 */
+internal-subprogram-part
+  : contains-stmt  internal-subprogram  {  internal-subprogram  }
+  ;
+/* R211 */
+internal-subprogram
+  : function-subprogram
+  |  subroutine-subprogram
+  ;
+/* R212 */
+module-subprogram-part
+  : contains-stmt  module-subprogram {  module-subprogram  }
+  ;
+/* R213 */
+module-subprogram
+  : function-subprogram
+  |  subroutine-subprogram
+  ;
+/* R214 */
+specification-stmt
+  : access-stmt
+/* Page 304 */
+  |  namelist-stmt
+  |  optional-stmt
+  ;
+/* R215 */
+executable-construct
+  : action-stmt
+  |  case-construct
+  |  do-construct
+  |  if-construct
+  |  where-construct
+  ;
+/* R216 */
+action-stmt
+  : allocate-stmt
+  |  assignment-stmt
+  |  backspace-stmt
+  |  call-stmt
+  |  close-stmt
+  |  cycle-stmt
+  |  deallocate-stmt
+  |  endfile-stmt
+  |  end-function-stmt
+  |  end-program-stmt
+  |  end-subroutine-stmt
+  |  exit-stmt
+  |  goto-stmt
+  |  if-stmt
+  |  inquire-stmt
+  |  nullify-stmt
+  |  open-stmt
+  |  pointer-assignment-stmt
+  |  read-stmt
+  |  return-stmt
+  |  rewind-stmt
+  |  stop-stmt
+  |  write-stmt
+  ;
+/* Page 305 */
+
+   /*** D.1.3  Characters, Lexical Tokens, and Source Form. ***/
+/* R301 */
+character
+  : alphanumeric-character
+  |  special-character
+  ;
+/* R302 */
+alphanumeric-character
+  : letter
+  |  digit
+  |  underscore
+  ;
+/* R303 */
+underscore                  
+  :  _
+  ;
+/* R304 */
+name
+  : letter {  alphanumeric-character  }
+  ;
+/* R305 */
+constant
+  : literal-constant
+  |  named-constant
+  ;
+/* R306 */
+literal-constant
+  : int-lit-constant
+  |  real-lit-constant
+  |  complex-lit-constant
+  |  logical-lit-constant
+  |  char-lit-constant
+  ;
+/* R307 */
+named-constant
+  : name
+  ;
+/* R308 */
+int-constant
+  : constant
+  ;
+/* R309 */
+char-constant
+  : constant
+  ;
+/* R310 */
+intrinsic-operator
+  : power-op
+  |  mult-op
+  |  add-op
+  |  concat-op
+  |  rel-op
+  |  not-op
+  |  and-op
+  |  or-op
+  |  equiv-op
+  ;
+/* R708 */
+power-op
+  : **
+  ;
+/* R709 */
+mult-op
+  : *
+  |  /
+  ;
+/* R710 */
+add-op
+  : +
+  |  -
+  ;
+/* R712 */
+concat-op
+  : //
+  ;
+/* R714 */
+rel-op
+  : .EQ.
+  |  .NE.
+  |  .LT.
+  |  .LE.
+  |  .GT.
+  |  .GE.
+  |  ==
+  |  /=
+/* Page 306 */
+  |  <
+  |  <=
+  |  >
+  |  >=
+  ;
+/* R719 */
+not-op
+  : .NOT.
+  ;
+/* R720 */
+and-op
+  : .AND.
+  ;
+/* R721 */
+or-op
+  : .OR.
+  ;
+/* R722 */
+equiv-op
+  : .EQV.
+  |  .NEQV.
+  ;
+/* R311 */
+defined-operator
+  : defined-unary-op
+  |  defined-binary-op
+  |  extended-intrinsic-op
+  ;
+/* R704 */
+defined-unary-op
+  : . letter {  letter  } .
+  ;
+/* R724 */
+defined-binary-op
+  : . letter {  letter  } .
+  ;
+/* R312 */
+extended-intrinsic-op
+  : intrinsic-operator
+  ;
+/* R313 */
+label
+  : digit [ digit [ digit [ digit [ digit ] ] ] ]
+  ;
+/*** D.1.4  Intrinsic and Derived Data Types. ***/
+
+
+/* R401 */
+signed-digit-string
+  : [ sign ] digit-string
+  ;
+/* R402 */
+digit-string
+  : digit {  digit  }
+  ;
+/* R403 */
+signed-int-lit-constant
+  : [ sign ] int-lit-constant
+  ;
+/* R404 */
+int-lit-constant
+  : digit-string [ _ kind-param ]
+  ;
+/* R405 */
+kind-param
+  : digit-string
+  |  scalar-int-constant-name
+  ;
+/* R406 */
+   sign
+  : +
+  |  -
+  ;
+/* R407 */
+boz-lit-constant
+  : binary-constant
+  |  octal-constant
+  |  hex-constant
+  ;
+/* R408 */
+binary-constant
+  : digit {  digit  }
+  ;
+/* R409 */
+octal-constant
+  : digit {  digit  }
+  ;
+/* Page 307 */
+
+/* R410 */
+hex-constant
+  : hex-digit {  hex-digit  }
+  ;
+/* R411 */
+hex-digit
+  : digit
+  |  A
+  |  B
+  |  C
+  |  D
+  |  E
+  |  F
+  ;
+/* R412 */
+   signed-real-lit-constant
+  : [ sign ] real-lit-constant
+  ;
+/* R413 */
+real-lit-constant
+  : significand [ xpn-letter xpn ]
+    [ _ kind-param ]
+  |  digit-string xpn-letter xpn
+    [ _ kind-param ]
+  ;
+/* R414 */
+significand
+  : digit-string . [ digit-string ]
+  |  . digit-string
+  ;
+/* R415 */
+xpn-letter
+  : E
+  ;
+/* R416 */
+xpn
+  : signed-digit-string
+  ;
+/* R417 */
+complex-lit-constant
+  : ( real-part , imag-part )
+  ;
+/* R418 */
+real-part
+  : signed-int-lit-constant
+  |  signed-real-lit-constant
+  ;
+/* R419 */
+imag-part
+  : signed-int-lit-constant
+  |  signed-real-lit-constant
+  ;
+/* R420 */
+char-lit-constant
+  : [ kind-param _ ] ' { rep-char } '
+  |  [ kind-param _ ] " { rep-char } "
+  ;
+/* R421 */
+logical-lit-constant
+  : .TRUE. [ _ kind-param ]
+  |  .FALSE. [ _ kind-param ]
+  ;
+/* R422 */
+derived-type-def
+  : derived-type-stmt
+    {  private-sequence-stmt  }
+    component-def-stmt
+    {  component-def-stmt  }
+    end-type-stmt
+  ;
+/* R423 */
+private-sequence-stmt
+  : PRIVATE
+  |  SEQUENCE
+  ;
+/* R424 */
+derived-type-stmt
+  : TYPE [ , access-spec ] "::"
+    type-name
+  ;
+/* Page 308 */
+
+/* R425 */
+end-type-stmt
+  : END TYPE type-name
+  ;
+/* R426 */
+component-def-stmt
+  : type-spec [ [ , component-attr-spec-list ] "::" ] component-decl-list
+  ;
+/* R427 */
+component-attr-spec
+  : POINTER
+  |  DIMENSION ( component-array-spec )
+  ;
+/* R428 */
+component-array-spec
+  : explicit-shape-spec-list
+  |  deferred-shape-spec-list
+  ;
+/* R429 */
+component-decl
+  : component-name [
+    ( component-array-spec ) ]
+    [ * char-length ]
+  ;
+/* R430 */
+structure-constructor
+  : type-name ( expr-list )
+  ;
+/* R431 */
+   array-constructor
+  : (/ ac-value-list /)
+  ;
+/* R432 */
+ac-value
+  : expr
+  |  ac-implied-do
+  ;
+/* R433 */
+ac-implied-do
+  : ( ac-value-list , ac-implied-do-control )
+  ;
+/* R434 */
+ac-implied-do-control
+  : ac-do-variable =  scalar-int-expr , scalar-int-expr [ , scalar-int-expr ]
+  ;
+/* R435 */
+ac-do-variable
+  : scalar-int-variable
+  ;
+
+/* Page 309 */
+   /*** D.1.5  Data Object Declarations and Specifications. ***/
+
+
+/* R501 */
+type-declaration-stmt
+  : type-spec {  , attr-spec  }  "::" entity-decl-list
+  ;
+/* R502 */
+type-spec
+  : INTEGER [ kind-selector ]
+  |  REAL [ kind-selector ]
+  |  COMPLEX [ kind-selector ]
+  |  CHARACTER [ char-selector ]
+  |  LOGICAL [ kind-selector ]
+  |  TYPE ( type-name )
+  ;
+/* R503 */
+attr-spec
+  : PARAMETER
+  | access-spec
+  | ALLOCATABLE
+  | DIMENSION ( array-spec )
+  | INTENT ( intent-spec )
+  | OPTIONAL
+  | POINTER
+  | SAVE
+  | TARGET
+  ;
+/* R504 */
+entity-decl
+  : object-name [ ( array-spec ) ]  [* char-length ] [ =  initialization-expr ]
+  |  function-name [ ( array-spec ) ]  [ * char-length ]
+  ;
+/* R505 */
+kind-selector
+  : ( [ KIND = ] scalar-int-initialization-expr )
+  ;
+
+/* Page 310 */
+
+/* R506 */
+char-selector
+  : length-selector
+  |  ( [ LEN= ] type-param-value , [ KIND= ] scalar-int-initialization-expr )
+  |  ( KIND= scalar-int-initialization-expr [ , LEN= type-param-value ] )
+  ;
+/* R507 */
+   length-selector
+  : ( [ LEN = ] type-param-value )
+  ;
+/* R508 */
+   char-length
+  : ( type-param-value )
+  |  scalar-int-lit-constant
+  ;
+/* R509 */
+type-param-value
+  : specification-expr
+  |  *
+  ;
+/* R510 */
+access-spec
+  : PUBLIC
+  |  PRIVATE
+  ;
+/* R511 */
+intent-spec
+  : IN
+  |  OUT
+  |  IN OUT
+  ;
+
+/* Page 311 */
+
+/* R512 */
+array-spec
+  : explicit-shape-spec-list
+  |  assumed-shape-spec-list
+  |  deferred-shape-spec-list
+  ;
+/* R513 */
+explicit-shape-spec
+  : [ lower-bound ":" ] upper-bound
+  ;
+/* R514 */
+lower-bound
+  : specification-expr
+  ;
+/* R515 */
+upper-bound
+  : specification-expr
+  ;
+/* R516 */
+assumed-shape-spec
+  : [ lower-bound ] ":"
+  ;
+/* R517 */
+deferred-shape-spec
+  : ":"
+  ;
+/* R520 */
+optional-stmt
+  : OPTIONAL "::" dummy-arg-name-list
+  ;
+/* R521 */
+access-stmt
+  : access-spec [ [ "::" ] access-id-list ]
+  ;
+/* R522 */
+access-id
+  : use-name
+  |  generic-spec
+  ;
+
+/* Page 312 */
+/* Page 313 */
+
+/* R543 */
+namelist-stmt
+  : NAMELIST /namelist-group-name/namelist-group-object-list
+    { [ , ] /namelist-group-name/namelist-group-object-list }
+  ;
+/* R544 */
+namelist-group-object
+  : variable-name
+  ;
+/* Page 314 */
+
+/*** D.1.6  Use of Data Objects. ***/
+
+/* R601 */
+variable
+  : scalar-variable-name
+  |  array-variable-name
+  |  subobject
+  ;
+/* R602 */
+subobject
+  : array-element
+  |  array-section
+  |  structure-component
+  |  substring
+  ;
+/* R603 */
+logical-variable
+  : variable
+  ;
+/* R604 */
+default-logical-variable
+  : variable
+  ;
+/* R605 */
+char-variable
+  : variable
+  ;
+/* Page 315 */
+
+/* R606 */
+default-char-variable
+  : variable
+  ;
+/* R607 */
+int-variable
+  : variable
+  ;
+/* R608 */
+default-int-variable
+  : variable
+  ;
+/* R609 */
+substring
+  : parent-string ( substring-range )
+
+  ;
+/* R610 */
+parent-string
+  : scalar-variable-name
+  |  array-element
+  |  scalar-structure-component
+  |  scalar-constant
+  ;
+/* R611 */
+substring-range
+  : [ scalar-int-expr ] ":"  [ scalar-int-expr ]
+  ;
+/* R612 */
+data-ref
+  : part-ref {  % part-ref  }
+  ;
+/* R613 */
+part-ref
+  : part-name [ ( section-subscript-list ) ]
+  ;
+/* R614 */
+structure-component
+  : data-ref
+  ;
+/* R615 */
+array-element
+  : data-ref
+  ;
+/* R616 */
+array-section
+  : data-ref [ ( substring-range ) ]
+  ;
+/* R617 */
+subscript
+  : scalar-int-expr
+  ;
+/* R618 */
+section-subscript
+  : subscript
+  |  subscript-triplet
+  |  vector-subscript
+  ;
+/* R619 */
+subscript-triplet
+  : [ subscript ] ":" [ subscript ]
+    [ ":" stride ]
+  ;
+/* R620 */
+stride
+  : scalar-int-expr
+  ;
+
+/* Page 316 */
+
+/* R621 */
+vector-subscript
+  : int-expr
+  ;
+/* R622 */
+allocate-stmt
+  : ALLOCATE ( allocation-list
+    [ , STAT= stat-variable ] )
+  ;
+/* R623 */
+stat-variable
+  : scalar-int-variable
+  ;
+/* R624 */
+allocation
+  : allocate-object [ ( explicit-shape-spec-list ) ]
+  ;
+/* R625 */
+allocate-object
+  : variable-name
+  |  structure-component
+  ;
+/* R626 */
+   allocate-shape-spec
+  : [ allocate-lower-bound ":" ]  allocate-upper-bound
+  ;
+/* R627 */
+allocate-lower-bound
+  : scalar-int-exp
+  ;
+/* R628 */
+allocate-upper-bound
+  : scalar-int-exp
+  ;
+/* R629 */
+nullify-stmt
+  : NULLIFY ( pointer-object-list )
+  ;
+/* R630 */
+pointer-object
+  : variable-name
+  |  structure-component
+  ;
+/* R631 */
+deallocate-stmt
+  : DEALLOCATE ( allocate-object-list  [ , STAT = stat-variable ] )
+  ;
+/*** D.1.7  Expressions and Assignment. ***/
+
+
+/* R701 */
+primary
+  : constant
+  |  constant-subobject
+  |  variable
+  |  array-constructor
+  |  structure-constructor
+  |  function-reference
+  |  ( expr )
+  ;
+/* R702 */
+constant-subobject
+  : subobject
+  ;
+/* R703 */
+   level-1-expr
+  : [ defined-unary-op ] primary
+  ;
+/* R704 */
+defined-unary-op
+  : . letter {  letter  } .
+  ;
+/* R705 */
+mult-operand
+  : level-1-expr [ power-op mult-operand ]
+  ;
+/* R706 */
+add-operand
+  : [ add-operand mult-op ] mult-operand
+  ;
+
+/* Page 317 */
+
+/* R707 */
+level-2-expr
+  : [ [ level-2-expr ] add-op ] add-operand
+  ;
+/* R708 */
+power-op
+  : **
+  ;
+/* R709 */
+mult-op
+  : *
+  |  /
+  ;
+/* R710 */
+add-op
+  : +
+  |  -
+  ;
+/* R711 */
+level-3-expr
+  : [ level-3-expr concat-op ]  level-2-expr
+  ;
+/* R712 */
+concat-op
+  : //
+  ;
+/* R713 */
+level-4-expr
+  : [ level-3-expr rel-op ]  level-3-expr
+  ;
+/* R714 */
+rel-op
+  : .EQ.
+  |  .NE.
+  |  .LT.
+  |  .LE.
+  |  .GT.
+  |  .GE.
+  |  ==
+  |  /=
+  |  <
+  |  <=
+  |  >
+  |  >=
+  ;
+/* R715 */
+and-operand
+  : [ not-op ] level-4-expr
+  ;
+/* R716 */
+or-operand
+  : [ or-operand and-op ]  and-operand
+  ;
+/* R717 */
+equiv-operand
+  : [ equiv-operand or-op ]
+  |-operand
+  ;
+/* R718 */
+level-5-expr
+  : [ level-5-expr equiv-op ]  equiv-operand
+  ;
+/* R719 */
+not-op
+  : .NOT.
+  ;
+/* R720 */
+and-op
+  : .AND.
+  ;
+/* R721 */
+or-op
+  : .OR.
+  ;
+/* R722 */
+equiv-op
+  : .EQV.
+  |  .NEQV.
+  ;
+/* R723 */
+expr
+  : [ expr defined-binary-op ]  level-5-expr
+  ;
+/* R724 */
+defined-binary-op
+  : . letter {  letter  } .
+  ;
+/* R725 */
+logical-expr
+  : expr
+  ;
+/* R726 */
+char-expr
+  : expr
+  ;
+/* R727 */
+default-char-expr
+  : expr
+  ;
+/* R728 */
+int-expr
+  : expr
+  ;
+
+/* Page 318 */
+
+/* R729 */
+numeric-expr
+  : expr
+  ;
+/* R730 */
+initz-expr
+  : expr
+  ;
+/* R731 */
+char-initz-expr
+  : char-expr
+  ;
+/* R732 */
+int-initz-expr
+  : int-expr
+  ;
+/* R733 */
+logical-initz-expr
+  : logical-expr
+  ;
+/* R734 */
+specification-expr
+  : scalar-int-expr
+  ;
+/* R735 */
+assignment-stmt
+  : variable = expr
+  ;
+/* R736 */
+pointer-assignment-stmt
+  : pointer-object => target
+  ;
+/* R737 */
+target
+  : variable
+  |  expr
+  ;
+/* R739 */
+where-construct
+  : where-construct-stmt
+    {  assignment-stmt  }
+    [ elsewhere-stmt {  assignment-stmt  } ]
+    end-where-stmt
+  ;
+/* R740 */
+where-construct-stmt
+  : WHERE ( mask-expr )
+  ;
+/* R741 */
+mask-expr
+  : logical-expr
+  ;
+/* R742 */
+elsewhere-stmt
+  : ELSEWHERE
+  ;
+/* R743 */
+end-where-stmt
+  : END WHERE
+  ;
+
+/* Page 319 */
+   /*** D.1.8  Execution Control. ***/
+
+/* R801 */
+block
+  : {  execution-part-construct  }
+  ;
+/* R802 */
+if-construct
+  : if-then-stmt
+    block
+    { else-if-stmt block }
+    [ else-stmt  block ]
+    end-if-stmt
+  ;
+/* R803 */
+if-then-stmt
+  : [ if-construct-name ":" ] IF ( scalar-logical-expr ) THEN
+  ;
+/* R804 */
+else-if-stmt
+  : ELSE IF ( scalar-logical-expr ) THEN [ if-construct-name ]
+  ;
+/* R805 */
+else-stmt
+  : ELSE [ if-construct-name ]
+  ;
+/* R806 */
+end-if-stmt
+  : END IF [ if-construct-name ]
+  ;
+/* R807 */
+if-stmt
+  : IF ( scalar-logical-expr )  action-stmt
+  ;
+/* R808 */
+case-construct
+  : select-case-stmt
+    { case-stmt  block }
+    end-select-stmt
+  ;
+/* R809 */
+   select-case-stmt
+  : [ case-construct-name ":" ]
+    SELECT CASE ( case-expr )
+  ;
+/* R810 */
+case-stmt
+  : CASE case-selector [case-construct-name]
+  ;
+/* R811 */
+end-select-stmt
+  : END SELECT [ case-construct-name ]
+  ;
+/* R812 */
+case-expr
+  : scalar-int-expr
+  |  scalar-char-expr
+  ;
+/* R813 */
+case-selector
+  : ( case-value-range-list )
+  |  DEFAULT
+  ;
+/* R814 */
+case-value-range
+  : case-value
+  |  case-value ":"
+  |  ":" case-value
+  |  case-value ":" case-value
+  ;
+/* Page 320 */
+
+/* R815 */
+case-value
+  : scalar-int-initz-expr
+  |  scalar-char-initz-expr
+  |  scalar-logical-initz-expr
+  ;
+/* R816 */
+do-construct
+  : block-do-construct
+  ;
+/* R817 */
+block-do-construct
+  : do-stmt
+    do-block
+    end-do
+  ;
+/* R818 */
+do-stmt
+  : nonlabel-do-stmt
+  ;
+/* R820 */
+   nonlabel-do-stmt
+  : [ do-construct-name ":" ] DO [ loop-control ]
+  ;
+/* R821 */
+loop-control
+  : do-variable = scalar-numeric-
+    expr , scalar-numeric-expr
+    [ , scalar-numeric-expr ]
+  |  WHILE ( scalar-logical-expr )
+  ;
+/* R822 */
+do-variable
+  : scalar-variable
+  ;
+/* R823 */
+do-block
+  : block
+  ;
+/* R824 */
+end-do
+  : end-do-stmt
+  ;
+/* R825 */
+end-do-stmt
+  : END DO [ do-construct-name ]
+  ;
+/* Page 321 */
+
+/* R834 */
+cycle-stmt
+  : CYCLE [ do-construct-name ]
+  ;
+/* R835 */
+exit-stmt
+  : EXIT [ do-construct-name ]
+  ;
+/* R836 */
+goto-stmt
+  : GO TO label
+  ;
+/* Page 322 */
+
+/* R842 */
+stop-stmt
+  : STOP [ stop-code ]
+  ;
+/* R843 */
+stop-code
+  : scalar-char-constant
+  |  digit [ digit [ digit [ digit [ digit ] ] ] ]
+  ;
+   /*** D.1.9  Input/Output Statements. ***/
+
+/* R901 */
+io-unit
+  : external-file-unit
+  |  internal-file-unit
+  ;
+/* R902 */
+external-file-unit
+  : scalar-int-expr
+  ;
+/* R903 */
+internal-file-unit
+  : default-char-variable
+  ;
+/* R904 */
+open-stmt
+  : OPEN ( connect-spec-list )
+  ;
+/* R905 */
+connect-spec
+  : [ UNIT= ] external-file-unit
+  |  IOSTAT= scalar-default-int-variable
+  |  ERR= label
+  |  FILE= file-name-expr
+  |  STATUS= scalar-default-char-expr
+  |  ACCESS= scalar-default-char-expr
+  |  FORM= scalar-default-char-expr
+  |  RECL= scalar-int-expr
+  |  POSITION= scalar-default-char-expr
+  |  ACTION= scalar-default-char-expr
+  |  DELIM= scalar-default-char-expr
+  |  PAD= scalar-default-char-expr
+  ;
+/* R906 */
+file-name-expr
+  : scalar-default-char-expr
+  ;
+/* R907 */
+close-stmt
+  : CLOSE ( close-spec-list )
+  ;
+/* R908 */
+   close-spec
+  : [ UNIT= ] external-file-unit
+  |  IOSTAT= scalar-default-int-variable
+  |  ERR= label
+  |  STATUS= scalar-default-char-expr
+  ;
+/* Page 323 */
+
+/* R909 */
+read-stmt
+  : READ ( io-control-spec-list )
+    [ input-item-list ]
+  ;
+/* R910 */
+write-stmt
+  : WRITE ( io-control-spec-list ) [ output-item-list ]
+  ;
+/* R912 */
+io-control-spec
+  : [ UNIT= ] io-unit
+  |  [ FMT= ] format
+  |  [ NML= ] namelist-group-name
+  |  REC= scalar-int-expr
+  |  IOSTAT= scalar-default-int-variable
+  |  ERR= label
+  |  END= label
+  |  ADVANCE= scalar-default-char-expr
+  |  SIZE= scalar-default-int-variable
+  |  EOR= label
+  ;
+/* R913 */
+format
+  : default-char-expr
+  |  label
+/* Page 324 */
+  |  *
+  ;
+/* R914 */
+input-item
+  : variable
+  |  io-implied-do
+  ;
+/* R915 */
+output-item
+  : expr
+  |  io-implied-do
+  ;
+/* R916 */
+io-implied-do
+  : ( io-implied-do-object-list , io-implied-do-control )
+  ;
+/* R917 */
+io-implied-do-object
+  : input-item
+  | output-item
+  ;
+/* R918 */
+io-implied-do-control
+  : do-variable = scalar-numeric-expr ,
+    scalar-numeric-expr [ , scalar-numeric-expr ]
+  ;
+/* R919 */
+backspace-stmt
+  : BACKSPACE( position-spec-list )
+  ;
+/* R920 */
+endfile-stmt
+  : ENDFILE ( position-spec-list )
+  ;
+/* R921 */
+rewind-stmt
+  : REWIND ( position-spec-list )
+  ;
+/* R922 */
+position-spec
+  : [ UNIT = ] external-file-unit
+  |  IOSTAT = scalar-default-int-variable
+  |  ERR = label
+  ;
+/* R923 */
+inquire-stmt
+  : INQUIRE ( inquire-spec-list )
+  | INQUIRE ( IOLENGTH =  scalar-default-int-variable )  output-item-list
+  ;
+/* R924 */
+inquire-spec
+  : [ UNIT = ] external-file-unit
+  |  FILE = file-name-expr
+  |  IOSTAT = scalar-default-int-variable
+  |  ERR = label
+  |  EXIST = scalar-default-logical-variable
+  |  OPENED = scalar-default-logical-variable
+  |  NUMBER = scalar-default-int-variable
+  |  NAMED = scalar-default-logical-variable
+/* Page 325 */
+  |  NAME = scalar-default-char-variable
+  |  ACCESS = scalar-default-char-variable
+  |  SEQUENTIAL = scalar-default-char-variable
+  |  DIRECT = scalar-default-char-variable
+  |  FORM = scalar-default-char-variable
+  |  FORMATTED = scalar-default-char-variable
+  |  UNFORMATTED = scalar-default-char-variable
+  |  RECL = scalar-default-int-variable
+  |  NEXTREC = scalar-default-int-variable
+  |  POSITION = scalar-default-char-variable
+  |  ACTION = scalar-default-char-variable
+  |  READ = scalar-default-char-variable
+  |  WRITE = scalar-default-char-variable
+  |  READWRITE = scalar-default-char-variable
+  |  DELIM = scalar-default-char-variable
+  |  PAD = scalar-default-char-variable
+  ;
+
+/*** D.1.10  Input/Output Editing. ***/
+
+/* R1001 */
+format-stmt
+  : FORMAT format-specification
+  ;
+/* R1002 */
+format-specification
+  : ( format-item-list )
+  ;
+/* R1003 */
+format-item
+  : [ r ] data-edit-desc
+  |  control-edit-desc
+  |  char-string-edit-desc
+  |  [ r ] ( format-item-list )
+  ;
+/* R1004 */
+r
+  : int-lit-constant
+  ;
+/* R1005 */
+data-edit-desc
+  : I w [ . m ]
+  |  B w [ . m ]
+  |  O w [ . m ]
+  |  Z w [ . m ]
+  |  F w . d
+/* Page 326 */
+  |  E w . d [ E e ]
+  |  EN w . d [ E e ]
+  |  ES w . d [ E e ]
+  |  G w . d [ E e ]
+  |  L w
+  |  A [ w ]
+  ;
+/* R1006 */
+w
+  : int-literal-constant
+  ;
+/* R1007 */
+m
+  : int-literal-constant
+  ;
+/* R1008 */
+d
+  : int-literal-constant
+  ;
+/* R1009 */
+e
+  : int-literal-constant
+  ;
+/* R1010 */
+control-edit-desc
+  : position-edit-desc
+  |  /
+  |  ":"
+  |  sign-edit-desc
+  ;
+/* R1012 */
+position-edit-desc
+  : T n
+  |  TL n
+  |  TR n
+  ;
+/* R1013 */
+n
+  : int-literal-constant
+  ;
+/* R1014 */
+sign-edit-desc
+  : SP
+  |  SS
+  ;
+/* R1016 */
+char-string-edit-desc
+  : char-literal-constant
+  ;
+
+/* Page 327 */
+   /*** D.1.11  Program Units. ***/
+
+/* R1101 */
+main-program
+  : [ program-stmt ]
+    [ specification-part ]
+    [ execution-part ]
+    [ internal-subprogram-part ]
+    end-program-stmt
+  ;
+/* R1102 */
+program-stmt
+  : PROGRAM program-name
+  ;
+/* R1103 */
+end-program-stmt
+  : END PROGRAM program-name
+  ;
+/* R1104 */
+module
+  : module-stmt
+    [ specification-part ]
+    [ module-subprogram-part ]
+    end-module-stmt
+  ;
+/* R1105 */
+module-stmt
+  : MODULE module-name
+  ;
+/* R1106 */
+end-module-stmt
+  : END MODULE module-name
+  ;
+/* R1107 */
+use-stmt
+  : USE module-name [ , rename-list ]
+  |  USE module-name , ONLY ":" [ only-list ]
+  ;
+/* R1108 */
+rename
+  : local-name => use-name
+  ;
+/* R1109 */
+only
+  : access-id
+  |  [ local-name => ] use-name
+  ;
+/* Page 328 */
+   /*** D.1.12  Procedures. ***/
+
+/* R1201 */
+interface-block
+  : interface-stmt
+    {  interface-body  }
+    {  module-procedure-stmt  }
+    end-interface-stmt
+  ;
+/* R1202 */
+interface-stmt
+  : INTERFACE [ generic-spec ]
+  ;
+/* R1203 */
+end-interface-stmt
+  : END INTERFACE
+  ;
+/* R1204 */
+interface-body
+  : function-stmt    [ specification-part ]    end-function-stmt
+  |  subroutine-stmt    [ specification-part ]    end-subroutine-stmt
+  ;
+/* R1205 */
+module-procedure-stmt
+  : MODULE PROCEDURE procedure-name-list
+  ;
+/* R1206 */
+generic-spec
+  : generic-name
+  |  OPERATOR ( defined-operator )
+  |  ASSIGNMENT ( = )
+  ;
+/* R1209 */
+function-reference
+  : function-name ( [ actual-arg-spec-list ] )
+  ;
+/* R1210 */
+call-stmt
+  : CALL subroutine-name ( [ actual-arg-spec-list ] )
+  ;
+/* R1211 */
+  actual-arg-spec
+  : [ keyword = ] actual-arg
+  ;
+/* R1212 */
+keyword
+  : dummy-arg-name
+  ;
+/* R1213 */
+actual-arg
+  : expr
+  |  variable
+  |  procedure-name
+  ;
+
+/* Page 329 */
+
+/* R1215 */
+function-subprogram
+  : function-stmt
+    [ specification-part ]
+    [ execution-part ]
+    [ internal-subprogram-part ]
+    end-function-stmt
+  ;
+/* R1216 */
+  function-stmt
+  : [ prefix ] FUNCTION function-name
+    ( [ dummy-arg-name-list ] )
+    [ RESULT ( result-name ) ]
+  ;
+/* R1217 */
+prefix
+  : RECURSIVE
+  ;
+/* R1218 */
+end-function-stmt
+  : END FUNCTION function-name
+  ;
+/* R1219 */
+subroutine-subprogram
+  : subroutine-stmt
+    [ specification-part ]
+    [ execution-part ]
+    [ internal-subprogram-part ]
+    end-subroutine-stmt
+  ;
+/* R1220 */
+subroutine-stmt
+  : [ RECURSIVE ] SUBROUTINE  subroutine-name ( [ dummy-arg-list ] )
+  ;
+/* R1221 */
+dummy-arg
+  : dummy-arg-name
+  ;
+/* R1222 */
+end-subroutine-stmt
+  : END SUBROUTINE subroutine-name
+  ;
+
+/* Page 330 */
+
+/* R1224 */
+return-stmt
+  : RETURN
+  ;
+
+/* R1225 */
+contains-stmt
+  : CONTAINS
+  ;
+
+
+
+

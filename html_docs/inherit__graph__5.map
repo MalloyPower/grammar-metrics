@@ -1,0 +1,4 @@
+base referer
+rect $classVocabSymbol.html 18,31 109,54
+rect $classNonTerminal.html 158,7 241,31
+rect $classTerminal.html 170,54 229,78

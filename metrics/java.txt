@@ -1,0 +1,579 @@
+The grammar: 
+START SYMBOL: Goal	Not used
+TERMINALS:
+abstract	default	if	private	throw	boolean	do	implements	protected	throws	break	double	import	public	transient	byte	else	instanceof	return	try	case	extends	int	short	void	catch	final	interface	static	volatile	char	finally	long	super	while	class	float	native	switch	const	Not used	for	new	synchronized	continue	goto	Not used	package	this	PLUSEQ	MINUSEQ	STAREQ	DIVEQ	MODEQ	XOREQ	ANDEQ	OREQ	LTLT	GTGT	GTGTEQ	LTLTEQ	EQEQ	NOTEQ	LEQ	GEQ	ANDAND	OROR	PLUSPLUS	MINUSMINUS	GTGTGT	GTGTGTEQ	IntegerLiteral	FloatingPointLiteral	BooleanLiteral	NullLiteral	CharacterLiteral	StringLiteral	Identifier	'['	']'	'.'	';'	'*'	','	'{'	'}'	'='	'('	')'	':'	'+'	'-'	'~'	'!'	'/'	'%'	'<'	'>'	'&'	'^'	'|'	'?'	
+NON-TERMINALS:
+0: Goal	-> CompilationUnit
+1: CompilationUnit	-> [PackageDeclaration] [ImportDeclarations] [TypeDeclarations]
+2: Literal	-> IntegerLiteral | FloatingPointLiteral | BooleanLiteral | CharacterLiteral | StringLiteral | NullLiteral
+3: Type	-> PrimitiveType | ReferenceType
+4: PrimitiveType	-> NumericType | boolean
+5: ReferenceType	-> ClassOrInterfaceType | ArrayType
+6: NumericType	-> IntegralType | FloatingPointType
+7: IntegralType	-> byte | short | int | long | char
+8: FloatingPointType	-> float | double
+9: ClassOrInterfaceType	-> ClassType | InterfaceType
+10: ArrayType	-> Type '[' ']'
+11: ClassType	-> TypeName
+12: InterfaceType	-> TypeName
+13: TypeName	-> Identifier | PackageName '.' Identifier
+14: PackageName	-> Identifier | PackageName '.' Identifier
+15: ExpressionName	-> Identifier | AmbiguousName '.' Identifier
+16: AmbiguousName	-> Identifier | AmbiguousName '.' Identifier
+17: MethodName	-> Identifier | AmbiguousName '.' Identifier
+18: PackageDeclaration	-> package PackageName ';'
+19: ImportDeclarations	-> ImportDeclaration | ImportDeclarations ImportDeclaration
+20: TypeDeclarations	-> TypeDeclaration | TypeDeclarations TypeDeclaration
+21: ImportDeclaration	-> SingleTypeImportDeclaration | TypeImportOnDemandDeclaration
+22: TypeDeclaration	-> ClassDeclaration | InterfaceDeclaration | ';'
+23: SingleTypeImportDeclaration	-> import TypeName ';'
+24: TypeImportOnDemandDeclaration	-> import PackageName '.' '*' ';'
+25: ClassDeclaration	-> [ClassModifiers] class Identifier [Super] [Interfaces] ClassBody
+26: InterfaceDeclaration	-> [InterfaceModifiers] interface Identifier [ExtendsInterfaces] InterfaceBody
+27: ClassModifiers	-> ClassModifier | ClassModifiers ClassModifier
+28: Super	-> extends ClassType
+29: Interfaces	-> implements InterfaceTypeList
+30: ClassBody	-> '{' [ClassBodyDeclarations] '}'
+31: ClassModifier	-> public | abstract | final
+32: InterfaceTypeList	-> InterfaceType | InterfaceTypeList ',' InterfaceType
+33: ClassBodyDeclarations	-> ClassBodyDeclaration | ClassBodyDeclarations ClassBodyDeclaration
+34: ClassBodyDeclaration	-> ClassMemberDeclaration | StaticInitializer | ConstructorDeclaration
+35: ClassMemberDeclaration	-> FieldDeclaration | MethodDeclaration
+36: StaticInitializer	-> static Block
+37: ConstructorDeclaration	-> [ConstructorModifiers] ConstructorDeclarator [Throws] ConstructorBody
+38: FieldDeclaration	-> [FieldModifiers] Type VariableDeclarators ';'
+39: MethodDeclaration	-> MethodHeader MethodBody
+40: FieldModifiers	-> FieldModifier | FieldModifiers FieldModifier
+41: VariableDeclarators	-> VariableDeclarator | VariableDeclarators ',' VariableDeclarator
+42: VariableDeclarator	-> VariableDeclaratorId | VariableDeclaratorId '=' VariableInitializer
+43: VariableDeclaratorId	-> Identifier | VariableDeclaratorId '[' ']'
+44: VariableInitializer	-> Expression | ArrayInitializer
+45: Expression	-> AssignmentExpression
+46: ArrayInitializer	-> '{' [VariableInitializers] [','] '}'
+47: FieldModifier	-> public | protected | private | final | static | transient | volatile
+48: MethodHeader	-> [MethodModifiers] ResultType MethodDeclarator [Throws]
+49: MethodBody	-> Block | ';'
+50: MethodModifiers	-> MethodModifier | MethodModifiers MethodModifier
+51: ResultType	-> Type | void
+52: MethodDeclarator	-> Identifier '(' [FormalParameterList] ')' | MethodDeclarator '[' ']'
+53: Throws	-> throws ClassTypeList
+54: FormalParameterList	-> FormalParameter | FormalParameterList ',' FormalParameter
+55: FormalParameter	-> Type VariableDeclaratorId
+56: MethodModifier	-> public | protected | private | abstract | static | final | synchronized | native
+57: ClassTypeList	-> ClassType | ClassTypeList ',' ClassType
+58: Block	-> '{' [BlockStatements] '}'
+59: ConstructorModifiers	-> ConstructorModifier | ConstructorModifiers ConstructorModifier
+60: ConstructorDeclarator	-> Identifier '(' [FormalParameterList] ')'
+61: ConstructorBody	-> '{' [ExplicitConstructorInvocation] [BlockStatements] '}'
+62: ConstructorModifier	-> public | protected | private
+63: ExplicitConstructorInvocation	-> this '(' [ArgumentList] ')' ';' | super '(' [ArgumentList] ')' ';'
+64: BlockStatements	-> BlockStatement | BlockStatements BlockStatement
+65: ArgumentList	-> Expression | ArgumentList ',' Expression
+66: InterfaceModifiers	-> InterfaceModifier | InterfaceModifiers InterfaceModifier
+67: ExtendsInterfaces	-> extends InterfaceType | ExtendsInterfaces ',' InterfaceType
+68: InterfaceBody	-> '{' [InterfaceMemberDeclarations] '}'
+69: InterfaceModifier	-> public | abstract
+70: InterfaceMemberDeclarations	-> InterfaceMemberDeclaration | InterfaceMemberDeclarations InterfaceMemberDeclaration
+71: InterfaceMemberDeclaration	-> ConstantDeclaration | AbstractMethodDeclaration
+72: ConstantDeclaration	-> ConstantModifiers Type VariableDeclarator
+73: AbstractMethodDeclaration	-> [AbstractMethodModifiers] ResultType MethodDeclarator [Throws] ';'
+74: ConstantModifiers	-> public | static | final
+75: AbstractMethodModifiers	-> AbstractMethodModifier | AbstractMethodModifiers AbstractMethodModifier
+76: AbstractMethodModifier	-> public | abstract
+77: VariableInitializers	-> VariableInitializer | VariableInitializers ',' VariableInitializer
+78: BlockStatement	-> LocalVariableDeclarationStatement | Statement
+79: LocalVariableDeclarationStatement	-> LocalVariableDeclaration ';'
+80: Statement	-> StatementWithoutTrailingSubstatement | LabeledStatement | IfThenStatement | IfThenElseStatement | WhileStatement | ForStatement
+81: LocalVariableDeclaration	-> Type VariableDeclarators
+82: StatementWithoutTrailingSubstatement	-> Block | EmptyStatement | ExpressionStatement | SwitchStatement | DoStatement | BreakStatement | ContinueStatement | ReturnStatement | SynchronizedStatement | ThrowStatement | TryStatement
+83: LabeledStatement	-> Identifier ':' Statement
+84: IfThenStatement	-> if '(' Expression ')' Statement
+85: IfThenElseStatement	-> if '(' Expression ')' StatementNoShortIf else Statement
+86: WhileStatement	-> while '(' Expression ')' Statement
+87: ForStatement	-> for '(' [ForInit] ';' [Expression] ';' [ForUpdate] ')' | Statement
+88: StatementNoShortIf	-> StatementWithoutTrailingSubstatement | LabeledStatementNoShortIf | IfThenElseStatementNoShortIf | WhileStatementNoShortIf | ForStatementNoShortIf
+89: LabeledStatementNoShortIf	-> Identifier ':' StatementNoShortIf
+90: IfThenElseStatementNoShortIf	-> if '(' Expression ')' StatementNoShortIf else StatementNoShortIf
+91: WhileStatementNoShortIf	-> while '(' Expression ')' StatementNoShortIf
+92: ForStatementNoShortIf	-> for '(' [ForInit] ';' [Expression] ';' [ForUpdate] ')' | StatementNoShortIf
+93: EmptyStatement	-> ';'
+94: ExpressionStatement	-> StatementExpression ';'
+95: SwitchStatement	-> switch '(' Expression ')' SwitchBlock
+96: DoStatement	-> do Statement while '(' Expression ')' ';'
+97: BreakStatement	-> break [Identifier] ';'
+98: ContinueStatement	-> continue [Identifier] ';'
+99: ReturnStatement	-> return [Expression] ';'
+100: SynchronizedStatement	-> synchronized '(' Expression ')' Block
+101: ThrowStatement	-> throw Expression ';'
+102: TryStatement	-> try Block Catches | try Block [Catches] Finally
+103: StatementExpression	-> Assignment | PreIncrementExpression | PreDecrementExpression | PostIncrementExpression | PostDecrementExpression | MethodInvocation | ClassInstanceCreationExpression
+104: Assignment	-> LeftHandSide AssignmentOperator AssignmentExpression
+105: PreIncrementExpression	-> PLUSPLUS UnaryExpression
+106: PreDecrementExpression	-> MINUSMINUS UnaryExpression
+107: PostIncrementExpression	-> PostfixExpression PLUSPLUS
+108: PostDecrementExpression	-> PostfixExpression MINUSMINUS
+109: MethodInvocation	-> MethodName '(' [ArgumentList] ')' | Primary '.' Identifier '(' [ArgumentList] ')' | super '.' Identifier '(' [ArgumentList] ')'
+110: ClassInstanceCreationExpression	-> new ClassType '(' [ArgumentList] ')'
+111: SwitchBlock	-> '{' [SwitchBlockStatementGroups] [SwitchLabels] '}'
+112: SwitchBlockStatementGroups	-> SwitchBlockStatementGroup | SwitchBlockStatementGroups SwitchBlockStatementGroup
+113: SwitchLabels	-> SwitchLabel | SwitchLabels SwitchLabel
+114: SwitchBlockStatementGroup	-> SwitchLabels BlockStatements
+115: SwitchLabel	-> case ConstantExpression ':' | default ':'
+116: ConstantExpression	-> Expression
+117: ForInit	-> StatementExpressionList | LocalVariableDeclaration
+118: ForUpdate	-> StatementExpressionList
+119: StatementExpressionList	-> StatementExpression | StatementExpressionList ',' StatementExpression
+120: Catches	-> CatchClause | Catches CatchClause
+121: Finally	-> finally Block
+122: CatchClause	-> catch '(' FormalParameter ')' Block
+123: Primary	-> PrimaryNoNewArray | ArrayCreationExpression
+124: PrimaryNoNewArray	-> Literal | this | '(' Expression ')' | ClassInstanceCreationExpression | FieldAccess | MethodInvocation | ArrayAccess
+125: ArrayCreationExpression	-> new PrimitiveType DimExprs [Dims] | new TypeName DimExprs [Dims]
+126: FieldAccess	-> Primary '.' Identifier | super '.' Identifier
+127: ArrayAccess	-> ExpressionName '[' Expression ']' | PrimaryNoNewArray '[' Expression ']'
+128: DimExprs	-> DimExpr | DimExprs DimExpr
+129: Dims	-> '[' ']' | Dims '[' ']'
+130: DimExpr	-> '[' Expression ']'
+131: PostfixExpression	-> Primary | ExpressionName | PostIncrementExpression | PostDecrementExpression
+132: UnaryExpression	-> PreIncrementExpression | PreDecrementExpression | '+' UnaryExpression | '-' UnaryExpression | UnaryExpressionNotPlusMinus
+133: UnaryExpressionNotPlusMinus	-> PostfixExpression | '~' UnaryExpression | '!' UnaryExpression | CastExpression
+134: CastExpression	-> '(' PrimitiveType [Dims] ')' UnaryExpression | '(' ReferenceType ')' UnaryExpressionNotPlusMinus
+135: MultiplicativeExpression	-> UnaryExpression | MultiplicativeExpression '*' UnaryExpression | MultiplicativeExpression '/' UnaryExpression | MultiplicativeExpression '%' UnaryExpression
+136: AdditiveExpression	-> MultiplicativeExpression | AdditiveExpression '+' MultiplicativeExpression | AdditiveExpression '-' MultiplicativeExpression
+137: ShiftExpression	-> AdditiveExpression | ShiftExpression LTLT AdditiveExpression | ShiftExpression GTGT AdditiveExpression | ShiftExpression GTGTGT AdditiveExpression
+138: RelationalExpression	-> ShiftExpression | RelationalExpression '<' ShiftExpression | RelationalExpression '>' ShiftExpression | RelationalExpression LEQ ShiftExpression | RelationalExpression GEQ ShiftExpression | RelationalExpression instanceof ReferenceType
+139: EqualityExpression	-> RelationalExpression | EqualityExpression EQEQ RelationalExpression | EqualityExpression NOTEQ RelationalExpression
+140: AndExpression	-> EqualityExpression | AndExpression '&' EqualityExpression
+141: ExclusiveOrExpression	-> AndExpression | ExclusiveOrExpression '^' AndExpression
+142: InclusiveOrExpression	-> ExclusiveOrExpression | InclusiveOrExpression '|' ExclusiveOrExpression
+143: ConditionalAndExpression	-> InclusiveOrExpression | ConditionalAndExpression ANDAND InclusiveOrExpression
+144: ConditionalOrExpression	-> ConditionalAndExpression | ConditionalOrExpression OROR ConditionalAndExpression
+145: ConditionalExpression	-> ConditionalOrExpression | ConditionalOrExpression '?' Expression ':' ConditionalExpression
+146: AssignmentExpression	-> ConditionalExpression | Assignment
+147: LeftHandSide	-> ExpressionName | FieldAccess | ArrayAccess
+148: AssignmentOperator	-> '=' | STAREQ | DIVEQ | MODEQ | PLUSEQ | MINUSEQ | LTLTEQ | GTGTEQ | GTGTGTEQ | XOREQ | ANDEQ | OREQ
+>>> There are 100 terminals and 149 non-terminals 
+>>> Total McCabe complexity is: 362
+McCabe Metrics:
+   1   4   6   2   2   2   2   5   2   2   1   1   1   2   2   2   2   2   1   2
+   2   2   3   1   1   4   3   2   1   1   2   3   2   2   3   2   1   3   2   1
+   2   2   2   2   2   1   3   7   3   2   2   2   3   1   2   1   8   2   2   2
+   2   3   3   4   2   2   2   2   2   2   2   2   1   3   3   2   2   2   2   1
+   6   1  11   1   1   1   1   5   5   1   1   1   5   1   1   1   1   2   2   2
+   1   1   3   7   1   1   1   1   1   6   2   3   2   2   1   2   1   2   1   2
+   2   1   1   2   7   4   2   2   2   2   1   4   5   4   3   4   3   4   6   3
+   2   2   2   2   2   2   2   3  12
+>>> Total Halstead volume is: 94634.6
+>>> Average RHS Size is: 4.14765
+GRAMMATICAL LEVELS:
+DERIVES-IN-ONE RELATION
+  0:  *                                                                                                                                                   
+  1:                   ***                                                                                                                                
+  2:                                                                                                                                                      
+  3:     **                                                                                                                                               
+  4:       *                                                                                                                                              
+  5:          **                                                                                                                                          
+  6:        **                                                                                                                                            
+  7:                                                                                                                                                      
+  8:                                                                                                                                                      
+  9:            **                                                                                                                                        
+ 10:    *                                                                                                                                                 
+ 11:              *                                                                                                                                       
+ 12:              *                                                                                                                                       
+ 13:               *                                                                                                                                      
+ 14:               *                                                                                                                                      
+ 15:                 *                                                                                                                                    
+ 16:                 *                                                                                                                                    
+ 17:                 *                                                                                                                                    
+ 18:               *                                                                                                                                      
+ 19:                    * *                                                                                                                               
+ 20:                     * *                                                                                                                              
+ 21:                        **                                                                                                                            
+ 22:                          **                                                                                                                          
+ 23:              *                                                                                                                                       
+ 24:               *                                                                                                                                      
+ 25:                            ****                                                                                                                      
+ 26:                                                                   ***                                                                                
+ 27:                            *   *                                                                                                                     
+ 28:            *                                                                                                                                         
+ 29:                                 *                                                                                                                    
+ 30:                                  *                                                                                                                   
+ 31:                                                                                                                                                      
+ 32:             *                   *                                                                                                                    
+ 33:                                  **                                                                                                                  
+ 34:                                    ***                                                                                                               
+ 35:                                       **                                                                                                             
+ 36:                                                           *                                                                                          
+ 37:                                                      *     ***                                                                                       
+ 38:    *                                    **                                                                                                           
+ 39:                                                 **                                                                                                   
+ 40:                                         *      *                                                                                                     
+ 41:                                          **                                                                                                          
+ 42:                                            **                                                                                                        
+ 43:                                            *                                                                                                         
+ 44:                                              **                                                                                                      
+ 45:                                                                                                                                                   *  
+ 46:                                                                              *                                                                       
+ 47:                                                                                                                                                      
+ 48:                                                   ****                                                                                               
+ 49:                                                           *                                                                                          
+ 50:                                                   *     *                                                                                            
+ 51:    *                                                                                                                                                 
+ 52:                                                     * *                                                                                              
+ 53:                                                          *                                                                                           
+ 54:                                                       **                                                                                             
+ 55:    *                                       *                                                                                                         
+ 56:                                                                                                                                                      
+ 57:            *                                             *                                                                                           
+ 58:                                                                 *                                                                                    
+ 59:                                                            *  *                                                                                      
+ 60:                                                       *                                                                                              
+ 61:                                                                **                                                                                    
+ 62:                                                                                                                                                      
+ 63:                                                                  *                                                                                   
+ 64:                                                                 *             *                                                                      
+ 65:                                              *                   *                                                                                   
+ 66:                                                                   *  *                                                                               
+ 67:             *                                                      *                                                                                 
+ 68:                                                                       *                                                                              
+ 69:                                                                                                                                                      
+ 70:                                                                       **                                                                             
+ 71:                                                                         **                                                                           
+ 72:    *                                      *                               *                                                                          
+ 73:                                                    ***                     *                                                                         
+ 74:                                                                                                                                                      
+ 75:                                                                            **                                                                        
+ 76:                                                                                                                                                      
+ 77:                                             *                                *                                                                       
+ 78:                                                                                **                                                                    
+ 79:                                                                                  *                                                                   
+ 80:                                                                                   ******                                                             
+ 81:    *                                     *                                                                                                           
+ 82:                                                           *                                  **********                                              
+ 83:                                                                                 *                                                                    
+ 84:                                              *                                  *                                                                    
+ 85:                                              *                                  *       *                                                            
+ 86:                                              *                                  *                                                                    
+ 87:                                              *                                  *                                    **                              
+ 88:                                                                                   *      ****                                                        
+ 89:                                                                                         *                                                            
+ 90:                                              *                                          *                                                            
+ 91:                                              *                                          *                                                            
+ 92:                                              *                                          *                            **                              
+ 93:                                                                                                                                                      
+ 94:                                                                                                        *                                             
+ 95:                                              *                                                                 *                                     
+ 96:                                              *                                  *                                                                    
+ 97:                                                                                                                                                      
+ 98:                                                                                                                                                      
+ 99:                                              *                                                                                                       
+100:                                              *            *                                                                                          
+101:                                              *                                                                                                       
+102:                                                           *                                                             **                           
+103:                                                                                                         *******                                      
+104:                                                                                                                                                   ***
+105:                                                                                                                                     *                
+106:                                                                                                                                     *                
+107:                                                                                                                                    *                 
+108:                                                                                                                                    *                 
+109:                  *                                               *                                                         *                         
+110:            *                                                     *                                                                                   
+111:                                                                                                                 **                                   
+112:                                                                                                                 * *                                  
+113:                                                                                                                  * *                                 
+114:                                                                 *                                                *                                   
+115:                                                                                                                     *                                
+116:                                              *                                                                                                       
+117:                                                                                  *                                     *                             
+118:                                                                                                                        *                             
+119:                                                                                                        *               *                             
+120:                                                                                                                         * *                          
+121:                                                           *                                                                                          
+122:                                                        *  *                                                                                          
+123:                                                                                                                             **                       
+124:   *                                          *                                                               **               **                     
+125:     *        *                                                                                                                  **                   
+126:                                                                                                                            *                         
+127:                *                             *                                                                              *                        
+128:                                                                                                                                 * *                  
+129:                                                                                                                                  *                   
+130:                                              *                                                                                                       
+131:                *                                                                                           **              *                         
+132:                                                                                                          **                         **               
+133:                                                                                                                                    ** *              
+134:     **                                                                                                                           *  **               
+135:                                                                                                                                     *  *             
+136:                                                                                                                                        **            
+137:                                                                                                                                         **           
+138:      *                                                                                                                                   **          
+139:                                                                                                                                           **         
+140:                                                                                                                                            **        
+141:                                                                                                                                             **       
+142:                                                                                                                                              **      
+143:                                                                                                                                               **     
+144:                                                                                                                                                **    
+145:                                              *                                                                                                  **   
+146:                                                                                                         *                                        *   
+147:                *                                                                                                              **                     
+148:                                                                                                                                                      
+DERIVES-IN-MANY RELATION
+  0:  ****************************************************************************************************************************************************
+  1:   ***************************************************************************************************************************************************
+  2:                                                                                                                                                      
+  3:    ************                                                                                                                                      
+  4:       ***                                                                                                                                            
+  5:    ************                                                                                                                                      
+  6:        **                                                                                                                                            
+  7:                                                                                                                                                      
+  8:                                                                                                                                                      
+  9:            ****                                                                                                                                      
+ 10:    ************                                                                                                                                      
+ 11:              **                                                                                                                                      
+ 12:              **                                                                                                                                      
+ 13:               *                                                                                                                                      
+ 14:               *                                                                                                                                      
+ 15:                 *                                                                                                                                    
+ 16:                 *                                                                                                                                    
+ 17:                 *                                                                                                                                    
+ 18:               *                                                                                                                                      
+ 19:              **    * * **                                                                                                                            
+ 20:   ****************  * *  ****************************************************************************************************************************
+ 21:              **        **                                                                                                                            
+ 22:   ****************       ****************************************************************************************************************************
+ 23:              **                                                                                                                                      
+ 24:               *                                                                                                                                      
+ 25:   ****************         ***************************************           ************************************************************************
+ 26:   ****************                        *****    ***** *       *************                          *******            **************************
+ 27:                            *   *                                                                                                                     
+ 28:            * **                                                                                                                                      
+ 29:             ***                 *                                                                                                                    
+ 30:   ****************               *********************************           ************************************************************************
+ 31:                                                                                                                                                      
+ 32:             ***                 *                                                                                                                    
+ 33:   ****************               *********************************           ************************************************************************
+ 34:   ****************                 *******************************           ************************************************************************
+ 35:   ****************                    *********************     **           ************************************************************************
+ 36:   ****************                       ******        *  *     **           ************************************************************************
+ 37:   ****************                       ******      *** *********           ************************************************************************
+ 38:   ****************                      ********                 *           *                          *******            **************************
+ 39:   ****************                       ****** ***********     **           ************************************************************************
+ 40:                                         *      *                                                                                                     
+ 41:   ****************                       ******                  *           *                          *******            **************************
+ 42:   ****************                         ****                  *           *                          *******            **************************
+ 43:                                            *                                                                                                         
+ 44:   ****************                          ***                  *           *                          *******            **************************
+ 45:   ****************                           *                   *                                      *******            **************************
+ 46:   ****************                          ***                  *           *                          *******            **************************
+ 47:                                                                                                                                                      
+ 48:    ************                            *      ********                                                                                           
+ 49:   ****************                       ******        *  *     **           ************************************************************************
+ 50:                                                   *     *                                                                                            
+ 51:    ************                                                                                                                                      
+ 52:    ************                            *        * **                                                                                             
+ 53:            * **                                          *                                                                                           
+ 54:    ************                            *          **                                                                                             
+ 55:    ************                            *                                                                                                         
+ 56:                                                                                                                                                      
+ 57:            * **                                          *                                                                                           
+ 58:   ****************                       ******        *  *     **           ************************************************************************
+ 59:                                                            *  *                                                                                      
+ 60:    ************                            *          **                                                                                             
+ 61:   ****************                       ******        *  *    ***           ************************************************************************
+ 62:                                                                                                                                                      
+ 63:   ****************                           *                   *                                      *******            **************************
+ 64:   ****************                       ******        *  *     **           ************************************************************************
+ 65:   ****************                           *                   *                                      *******            **************************
+ 66:                                                                   *  *                                                                               
+ 67:             ***                                                    *                                                                                 
+ 68:   ****************                        *****    ***** *       *    ********                          *******            **************************
+ 69:                                                                                                                                                      
+ 70:   ****************                        *****    ***** *       *    ********                          *******            **************************
+ 71:   ****************                        *****    ***** *       *      ******                          *******            **************************
+ 72:   ****************                        *****                  *        *  *                          *******            **************************
+ 73:    ************                            *       ***** *                 **                                                                        
+ 74:                                                                                                                                                      
+ 75:                                                                            **                                                                        
+ 76:                                                                                                                                                      
+ 77:   ****************                          ***                  *           *                          *******            **************************
+ 78:   ****************                       ******        *  *     **           ************************************************************************
+ 79:   ****************                       ******                  *           *   *                      *******            **************************
+ 80:   ****************                       ******        *  *     **           ************************************************************************
+ 81:   ****************                       ******                  *           *                          *******            **************************
+ 82:   ****************                       ******        *  *     **           ************************************************************************
+ 83:   ****************                       ******        *  *     **           ************************************************************************
+ 84:   ****************                       ******        *  *     **           ************************************************************************
+ 85:   ****************                       ******        *  *     **           ************************************************************************
+ 86:   ****************                       ******        *  *     **           ************************************************************************
+ 87:   ****************                       ******        *  *     **           ************************************************************************
+ 88:   ****************                       ******        *  *     **           ************************************************************************
+ 89:   ****************                       ******        *  *     **           ************************************************************************
+ 90:   ****************                       ******        *  *     **           ************************************************************************
+ 91:   ****************                       ******        *  *     **           ************************************************************************
+ 92:   ****************                       ******        *  *     **           ************************************************************************
+ 93:                                                                                                                                                      
+ 94:   ****************                           *                   *                                     ********            **************************
+ 95:   ****************                       ******        *  *     **           ************************************************************************
+ 96:   ****************                       ******        *  *     **           ************************************************************************
+ 97:                                                                                                                                                      
+ 98:                                                                                                                                                      
+ 99:   ****************                           *                   *                                      *******            **************************
+100:   ****************                       ******        *  *     **           ************************************************************************
+101:   ****************                           *                   *                                      *******            **************************
+102:   ****************                       ******        *  *     **           ************************************************************************
+103:   ****************                           *                   *                                      *******            **************************
+104:   ****************                           *                   *                                      *******            **************************
+105:   ****************                           *                   *                                      *******            **************************
+106:   ****************                           *                   *                                      *******            **************************
+107:   ****************                           *                   *                                      *******            **************************
+108:   ****************                           *                   *                                      *******            **************************
+109:   ****************                           *                   *                                      *******            **************************
+110:   ****************                           *                   *                                      *******            **************************
+111:   ****************                       ******        *  *     **           ************************************************************************
+112:   ****************                       ******        *  *     **           ************************************************************************
+113:   ****************                           *                   *                                      *******  * **      **************************
+114:   ****************                       ******        *  *     **           ************************************************************************
+115:   ****************                           *                   *                                      *******     *      **************************
+116:   ****************                           *                   *                                      *******            **************************
+117:   ****************                       ******                  *           *   *                     ********        *   **************************
+118:   ****************                           *                   *                                     ********        *   **************************
+119:   ****************                           *                   *                                     ********        *   **************************
+120:   ****************                       ******        *  *     **           ************************************************************************
+121:   ****************                       ******        *  *     **           ************************************************************************
+122:   ****************                       ******        *  *     **           ************************************************************************
+123:   ****************                           *                   *                                      *******            **************************
+124:   ****************                           *                   *                                      *******            **************************
+125:   ****************                           *                   *                                      *******            **************************
+126:   ****************                           *                   *                                      *******            **************************
+127:   ****************                           *                   *                                      *******            **************************
+128:   ****************                           *                   *                                      *******            **************************
+129:                                                                                                                                  *                   
+130:   ****************                           *                   *                                      *******            **************************
+131:   ****************                           *                   *                                      *******            **************************
+132:   ****************                           *                   *                                      *******            **************************
+133:   ****************                           *                   *                                      *******            **************************
+134:   ****************                           *                   *                                      *******            **************************
+135:   ****************                           *                   *                                      *******            **************************
+136:   ****************                           *                   *                                      *******            **************************
+137:   ****************                           *                   *                                      *******            **************************
+138:   ****************                           *                   *                                      *******            **************************
+139:   ****************                           *                   *                                      *******            **************************
+140:   ****************                           *                   *                                      *******            **************************
+141:   ****************                           *                   *                                      *******            **************************
+142:   ****************                           *                   *                                      *******            **************************
+143:   ****************                           *                   *                                      *******            **************************
+144:   ****************                           *                   *                                      *******            **************************
+145:   ****************                           *                   *                                      *******            **************************
+146:   ****************                           *                   *                                      *******            **************************
+147:   ****************                           *                   *                                      *******            **************************
+148:                                                                                                                                                      
+Fenton impurity is: 0.444404
+>>> Fenton closed impurity is: 32.7018
+Class #3: (size = 3) 
+	Type	ReferenceType	ArrayType
+Class #42: (size = 3) 
+	VariableInitializer	ArrayInitializer	VariableInitializers
+Class #43: (size = 33) 
+	Expression	ArgumentList	Assignment	PreIncrementExpression	PreDecrementExpression	PostIncrementExpression	PostDecrementExpression
+	MethodInvocation	ClassInstanceCreationExpression	Primary	PrimaryNoNewArray	ArrayCreationExpression	FieldAccess	ArrayAccess
+	DimExprs	DimExpr	PostfixExpression	UnaryExpression	UnaryExpressionNotPlusMinus	CastExpression	MultiplicativeExpression
+	AdditiveExpression	ShiftExpression	RelationalExpression	EqualityExpression	AndExpression	ExclusiveOrExpression	InclusiveOrExpression
+	ConditionalAndExpression	ConditionalOrExpression	ConditionalExpression	AssignmentExpression	LeftHandSide
+Class #55: (size = 25) 
+	Block	BlockStatements	BlockStatement	Statement	StatementWithoutTrailingSubstatement	LabeledStatement	IfThenStatement
+	IfThenElseStatement	WhileStatement	ForStatement	StatementNoShortIf	LabeledStatementNoShortIf	IfThenElseStatementNoShortIf	WhileStatementNoShortIf
+	ForStatementNoShortIf	SwitchStatement	DoStatement	SynchronizedStatement	TryStatement	SwitchBlock	SwitchBlockStatementGroups
+	SwitchBlockStatementGroup	Catches	Finally	CatchClause
+>>> There are 89 equivalence classes, 4 of which are non-singleton
+As a percentage of the number of non-terminals, there are 59.7% equivalence classes 
+>>> (Depth) Largest equivalence class has 33 non-terminals
+Varju height metric is: 25.8
+EQUIVALENCE GRAPH (size 89)
+0:  ****************************************************************************************
+1:   ***************************************************************************************
+2:                                                                                          
+3:     *********                                                                            
+4:      ***                                                                                 
+5:       **                                                                                 
+6:                                                                                          
+7:                                                                                          
+8:          ****                                                                            
+9:            **                                                                            
+10:            **                                                                            
+11:             *                                                                            
+12:                                                                                          
+13:               *                                                                          
+14:                                                                                          
+15:               *                                                                          
+16:             *                                                                            
+17:            **      * **                                                                  
+18:   **************    *  ******************************************************************
+19:            **        **                                                                  
+20:   **************       ******************************************************************
+21:            **                                                                            
+22:             *                                                                            
+23:   **************         ************************************           *****************
+24:   **************                        ****    ***** *      ***********               **
+25:                              *                                                           
+26:          * **                                                                            
+27:           ***                 *                                                          
+28:   **************               ******************************           *****************
+29:                                                                                          
+30:           ***                                                                            
+31:   **************                *****************************           *****************
+32:   **************                 ****************************           *****************
+33:   **************                    ********************                *****************
+34:   **************                       *****        *  *                *****************
+35:   **************                       *****      *** *******           *****************
+36:   **************                      *******                                          **
+37:   **************                       ***** ***********                *****************
+38:                                             *                                            
+39:   **************                        ****                                           **
+40:   **************                         ***                                           **
+41:                                                                                          
+42:   **************                           *                                           **
+43:   **************                                                                       **
+44:                                                                                          
+45:    **********                            *     ********                                  
+46:   **************                       *****        *  *                *****************
+47:                                                      *                                   
+48:    **********                                                                            
+49:    **********                            *         **                                    
+50:          * **                                         *                                  
+51:    **********                            *          *                                    
+52:    **********                            *                                               
+53:                                                                                          
+54:          * **                                                                            
+55:   **************                       *****        *                   *****************
+56:                                                            *                             
+57:    **********                            *         **                                    
+58:   **************                       *****        *  *    *           *****************
+59:                                                                                          
+60:   **************                           *                                           **
+61:                                                                 *                        
+62:           ***                                                                            
+63:   **************                        ****    ***** *          *******               **
+64:                                                                                          
+65:   **************                        ****    ***** *           ******               **
+66:   **************                        ****    ***** *            *****               **
+67:   **************                        ****                         *                 **
+68:    **********                            *      ***** *               **                 
+69:                                                                                          
+70:                                                                        *                 
+71:                                                                                          
+72:   **************                       *****                             *             **
+73:   **************                       *****                                           **
+74:                                                                                          
+75:   **************                           *                                    *      **
+76:                                                                                          
+77:                                                                                          
+78:   **************                           *                                           **
+79:   **************                           *                                           **
+80:   **************                           *                                           **
+81:   **************                           *                                      **   **
+82:   **************                           *                                       *   **
+83:   **************                           *                                           **
+84:   **************                       *****                             *      *     ***
+85:   **************                           *                                    *     ***
+86:   **************                           *                                    *      **
+87:                                                                                          
+88:                                                                                          

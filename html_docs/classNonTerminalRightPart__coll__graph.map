@@ -1,0 +1,4 @@
+base referer
+rect $classRightPart.html 6,188 78,278
+rect $classNonTerminal.html 105,372 211,550
+rect $classVocabSymbol.html 102,158 214,308

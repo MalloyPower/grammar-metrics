@@ -1,0 +1,757 @@
+The grammar: 
+START SYMBOL: program	Not used
+TERMINALS:
+IDENTIFIER	TYPENAME	SELFNAME	PFUNCNAME	SCSPEC	TYPESPEC	CV_QUALIFIER	CONSTANT	STRING	ELLIPSIS	SIZEOF	ENUM	IF	ELSE	WHILE	DO	FOR	SWITCH	CASE	DEFAULT	BREAK	CONTINUE	RETURN	GOTO	ASM_KEYWORD	GCC_ASM_KEYWORD	TYPEOF	ALIGNOF	SIGOF	ATTRIBUTE	EXTENSION	LABEL	REALPART	IMAGPART	AGGR	VISSPEC	DELETE	NEW	THIS	OPERATOR	CXX_TRUE	CXX_FALSE	NAMESPACE	TYPENAME_KEYWORD	USING	LEFT_RIGHT	TEMPLATE	TYPEID	DYNAMIC_CAST	STATIC_CAST	REINTERPRET_CAST	CONST_CAST	SCOPE	EMPTY	Not used	error	PTYPENAME	NSNAME	'{'	','	';'	THROW	':'	ASSIGN	'='	'?'	OROR	ANDAND	'|'	'^'	'&'	MIN_MAX	EQCOMPARE	ARITHCOMPARE	'<'	'>'	LSHIFT	RSHIFT	'+'	'-'	'*'	'/'	'%'	POINTSAT_STAR	DOT_STAR	UNARY	Not used	PLUSPLUS	MINUSMINUS	'~'	HYPERUNARY	Not used	PAREN_STAR_PAREN	POINTSAT	'.'	'('	'['	TRY	CATCH	TYPENAME_ELLIPSIS	PRE_PARSED_FUNCTION_DECL	EXTERN_LANG_STRING	ALL	Not used	PRE_PARSED_CLASS_DECL	Not used	DEFARG	DEFARG_MARKER	TYPENAME_DEFN	IDENTIFIER_DEFN	PTYPENAME_DEFN	END_OF_LINE	Not used	END_OF_SAVED_INPUT	')'	'}'	'!'	']'	
+NON-TERMINALS:
+0: program	-> /* Empty */ | extdefs
+1: extdefs	-> lang_extdef | extdefs lang_extdef
+2: lang_extdef	-> extdef
+3: extdefs_opt	-> extdefs | /* Empty */
+4: .hush_warning	-> /* Empty */
+5: .warning_ok	-> /* Empty */
+6: extension	-> EXTENSION
+7: asm_keyword	-> ASM_KEYWORD | GCC_ASM_KEYWORD
+8: extdef	-> fndef eat_saved_input | datadef | template_def | asm_keyword '(' string ')' ';' | extern_lang_string '{' extdefs_opt '}' | extern_lang_string .hush_warning fndef .warning_ok eat_saved_input | extern_lang_string .hush_warning datadef .warning_ok | NAMESPACE identifier '{' extdefs_opt '}' | NAMESPACE '{' extdefs_opt '}' | NAMESPACE identifier '=' any_id ';' | using_decl ';' | USING NAMESPACE any_id ';' | extension extdef
+9: fndef	-> fn.def1 maybe_return_init ctor_initializer_opt compstmt_or_error | fn.def1 maybe_return_init function_try_block | fn.def1 maybe_return_init error
+10: eat_saved_input	-> /* Empty */ | END_OF_SAVED_INPUT
+11: datadef	-> nomods_initdecls ';' | declmods notype_initdecls ';' | typed_declspecs initdecls ';' | declmods ';' | explicit_instantiation ';' | typed_declspecs ';' | error ';' | error '}' | ';'
+12: template_def	-> template_header extdef | template_header error
+13: string	-> STRING | string STRING
+14: extern_lang_string	-> EXTERN_LANG_STRING | extern_lang_string EXTERN_LANG_STRING
+15: identifier	-> IDENTIFIER | TYPENAME | SELFNAME | PTYPENAME | NSNAME
+16: any_id	-> unqualified_id | qualified_id | global_scope qualified_id | global_scope unqualified_id
+17: using_decl	-> USING qualified_id | USING global_scope qualified_id | USING global_scope unqualified_id
+18: qualified_id	-> nested_name_specifier unqualified_id | nested_name_specifier object_template_id
+19: global_scope	-> SCOPE
+20: unqualified_id	-> notype_unqualified_id | TYPENAME | SELFNAME
+21: template_header	-> TEMPLATE '<' template_parm_list '>' | TEMPLATE '<' '>'
+22: template_parm_list	-> template_parm | template_parm_list ',' template_parm
+23: template_parm	-> template_type_parm | template_type_parm '=' type_id | parm | parm '=' expr_no_commas
+24: template_type_parm	-> aggr | aggr identifier | TYPENAME_KEYWORD | TYPENAME_KEYWORD identifier
+25: aggr	-> AGGR | aggr SCSPEC | aggr TYPESPEC | aggr CV_QUALIFIER | aggr AGGR
+26: type_id	-> typed_typespecs absdcl | nonempty_cv_qualifiers absdcl | typespec absdcl | typed_typespecs | nonempty_cv_qualifiers
+27: parm	-> named_parm | type_id
+28: expr_no_commas	-> cast_expr | expr_no_commas POINTSAT_STAR expr_no_commas | expr_no_commas DOT_STAR expr_no_commas | expr_no_commas '+' expr_no_commas | expr_no_commas '-' expr_no_commas | expr_no_commas '*' expr_no_commas | expr_no_commas '/' expr_no_commas | expr_no_commas '%' expr_no_commas | expr_no_commas LSHIFT expr_no_commas | expr_no_commas RSHIFT expr_no_commas | expr_no_commas ARITHCOMPARE expr_no_commas | expr_no_commas '<' expr_no_commas | expr_no_commas '>' expr_no_commas | expr_no_commas EQCOMPARE expr_no_commas | expr_no_commas MIN_MAX expr_no_commas | expr_no_commas '&' expr_no_commas | expr_no_commas '|' expr_no_commas | expr_no_commas '^' expr_no_commas | expr_no_commas ANDAND expr_no_commas | expr_no_commas OROR expr_no_commas | expr_no_commas '?' xexpr ':' expr_no_commas | expr_no_commas '=' expr_no_commas | expr_no_commas ASSIGN expr_no_commas | THROW | THROW expr_no_commas
+29: nomods_initdecls	-> nomods_initdcl0 | nomods_initdecls ',' initdcl
+30: declmods	-> nonempty_cv_qualifiers | SCSPEC | declmods CV_QUALIFIER | declmods SCSPEC | declmods attributes | attributes
+31: notype_initdecls	-> notype_initdcl0 | notype_initdecls ',' initdcl
+32: typed_declspecs	-> typed_typespecs | typed_declspecs1
+33: initdecls	-> initdcl0 | initdecls ',' initdcl
+34: explicit_instantiation	-> TEMPLATE typespec ';' | TEMPLATE typed_declspecs declarator | TEMPLATE notype_declarator | TEMPLATE constructor_declarator | SCSPEC TEMPLATE typespec ';' | SCSPEC TEMPLATE typed_declspecs declarator | SCSPEC TEMPLATE notype_declarator | SCSPEC TEMPLATE constructor_declarator
+35: ctor_initializer_opt	-> nodecls | base_init
+36: nodecls	-> /* Empty */
+37: base_init	-> ':' .set_base_init member_init_list
+38: maybe_return_init	-> /* Empty */ | return_init | return_init ';'
+39: return_init	-> return_id maybe_init | return_id '(' nonnull_exprlist ')' | return_id LEFT_RIGHT
+40: fn.def1	-> typed_declspecs declarator | declmods notype_declarator | notype_declarator | declmods constructor_declarator | constructor_declarator
+41: compstmt_or_error	-> compstmt | error compstmt
+42: function_try_block	-> TRY ctor_initializer_opt compstmt handler_seq
+43: constructor_declarator	-> nested_name_specifier SELFNAME '(' parmlist ')' cv_qualifiers exception_specification_opt | nested_name_specifier SELFNAME LEFT_RIGHT cv_qualifiers exception_specification_opt | global_scope nested_name_specifier SELFNAME '(' parmlist ')' cv_qualifiers exception_specification_opt | global_scope nested_name_specifier SELFNAME LEFT_RIGHT cv_qualifiers exception_specification_opt | nested_name_specifier self_template_type '(' parmlist ')' cv_qualifiers exception_specification_opt | nested_name_specifier self_template_type LEFT_RIGHT cv_qualifiers exception_specification_opt | global_scope nested_name_specifier self_template_type '(' parmlist ')' cv_qualifiers exception_specification_opt | global_scope nested_name_specifier self_template_type LEFT_RIGHT cv_qualifiers exception_specification_opt
+44: nested_name_specifier	-> nested_name_specifier_1 | nested_name_specifier nested_name_specifier_1
+45: parmlist	-> /* Empty */ | complex_parmlist | type_id
+46: cv_qualifiers	-> /* Empty */ | cv_qualifiers CV_QUALIFIER
+47: exception_specification_opt	-> /* Empty */ | THROW '(' ansi_raise_identifiers ')' | THROW LEFT_RIGHT
+48: self_template_type	-> SELFNAME '<' template_arg_list template_close_bracket | SELFNAME '<' template_close_bracket
+49: declarator	-> after_type_declarator | notype_declarator
+50: notype_declarator	-> '*' nonempty_cv_qualifiers notype_declarator | '&' nonempty_cv_qualifiers notype_declarator | '*' notype_declarator | '&' notype_declarator | ptr_to_mem cv_qualifiers notype_declarator | direct_notype_declarator
+51: component_constructor_declarator	-> SELFNAME '(' parmlist ')' cv_qualifiers exception_specification_opt | SELFNAME LEFT_RIGHT cv_qualifiers exception_specification_opt | self_template_type '(' parmlist ')' cv_qualifiers exception_specification_opt | self_template_type LEFT_RIGHT cv_qualifiers exception_specification_opt
+52: fn.def2	-> declmods component_constructor_declarator | component_constructor_declarator | typed_declspecs declarator | declmods notype_declarator | notype_declarator | declmods constructor_declarator | constructor_declarator | template_header fn.def2
+53: return_id	-> RETURN IDENTIFIER
+54: maybe_init	-> /* Empty */ | '=' init
+55: nonnull_exprlist	-> expr_no_commas | nontrivial_exprlist
+56: .set_base_init	-> /* Empty */
+57: member_init_list	-> /* Empty */ | member_init | member_init_list ',' member_init | member_init_list error
+58: member_init	-> '(' nonnull_exprlist ')' | LEFT_RIGHT | notype_identifier '(' nonnull_exprlist ')' | notype_identifier LEFT_RIGHT | nonnested_type '(' nonnull_exprlist ')' | nonnested_type LEFT_RIGHT | typename_sub '(' nonnull_exprlist ')' | typename_sub LEFT_RIGHT
+59: notype_identifier	-> IDENTIFIER | PTYPENAME | NSNAME
+60: nonnested_type	-> type_name | global_scope type_name
+61: typename_sub	-> typename_sub0 | global_scope typename_sub0
+62: identifier_defn	-> IDENTIFIER_DEFN | TYPENAME_DEFN | PTYPENAME_DEFN
+63: typespec	-> structsp | TYPESPEC | complete_type_name | TYPEOF '(' expr ')' | TYPEOF '(' type_id ')' | SIGOF '(' expr ')' | SIGOF '(' type_id ')'
+64: template_type	-> PTYPENAME '<' template_arg_list template_close_bracket | PTYPENAME '<' template_close_bracket | TYPENAME '<' template_arg_list template_close_bracket | TYPENAME '<' template_close_bracket | self_template_type
+65: template_arg_list	-> template_arg | template_arg_list ',' template_arg
+66: template_close_bracket	-> '>' | RSHIFT
+67: template_arg	-> type_id | expr_no_commas
+68: unop	-> '-' | '+' | PLUSPLUS | MINUSMINUS | '!'
+69: expr	-> nontrivial_exprlist | expr_no_commas
+70: nontrivial_exprlist	-> expr_no_commas ',' expr_no_commas | expr_no_commas ',' error | nontrivial_exprlist ',' expr_no_commas | nontrivial_exprlist ',' error
+71: paren_expr_or_null	-> LEFT_RIGHT | '(' expr ')'
+72: paren_cond_or_null	-> LEFT_RIGHT | '(' condition ')'
+73: condition	-> type_specifier_seq declarator maybeasm maybe_attribute '=' init | expr
+74: xcond	-> /* Empty */ | condition | error
+75: type_specifier_seq	-> typed_typespecs | nonempty_cv_qualifiers
+76: maybeasm	-> /* Empty */ | asm_keyword '(' string ')'
+77: maybe_attribute	-> /* Empty */ | attributes
+78: init	-> expr_no_commas | '{' '}' | '{' initlist '}' | '{' initlist ',' '}' | error
+79: compstmtend	-> '}' | maybe_label_decls stmts '}' | maybe_label_decls stmts error '}' | maybe_label_decls error '}'
+80: maybe_label_decls	-> /* Empty */ | label_decls
+81: stmts	-> stmt | errstmt | stmts stmt | stmts errstmt
+82: already_scoped_stmt	-> '{' compstmtend | simple_stmt
+83: simple_stmt	-> decl | expr ';' | simple_if ELSE implicitly_scoped_stmt .poplevel | simple_if | WHILE .pushlevel paren_cond_or_null already_scoped_stmt .poplevel | DO implicitly_scoped_stmt WHILE paren_expr_or_null ';' | FOR '(' for.init.statement .pushlevel xcond ';' xexpr ')' already_scoped_stmt .poplevel | SWITCH .pushlevel '(' condition ')' implicitly_scoped_stmt .poplevel | CASE expr_no_commas ':' stmt | CASE expr_no_commas ELLIPSIS expr_no_commas ':' stmt | DEFAULT ':' stmt | BREAK ';' | CONTINUE ';' | RETURN ';' | RETURN expr ';' | asm_keyword maybe_cv_qualifier '(' string ')' ';' | asm_keyword maybe_cv_qualifier '(' string ':' asm_operands ')' ';' | asm_keyword maybe_cv_qualifier '(' string ':' asm_operands ':' asm_operands ')' ';' | asm_keyword maybe_cv_qualifier '(' string ':' asm_operands ':' asm_operands ':' asm_clobbers ')' ';' | GOTO '*' expr ';' | GOTO identifier ';' | label_colon stmt | label_colon '}' '}' | ';' | try_block
+84: unary_expr	-> primary | extension cast_expr | '*' cast_expr | '&' cast_expr | '~' cast_expr | unop cast_expr | ANDAND identifier | SIZEOF unary_expr | SIZEOF '(' type_id ')' | ALIGNOF unary_expr | ALIGNOF '(' type_id ')' | new new_type_id | new new_type_id new_initializer | new new_placement new_type_id | new new_placement new_type_id new_initializer | new '(' type_id ')' | new '(' type_id ')' new_initializer | new new_placement '(' type_id ')' | new new_placement '(' type_id ')' new_initializer | delete cast_expr | delete '[' ']' cast_expr | delete '[' expr ']' cast_expr | REALPART cast_expr | IMAGPART cast_expr
+85: primary	-> notype_unqualified_id | CONSTANT | boolean.literal | string | '(' expr ')' | '(' expr_or_declarator ')' | '(' error ')' | '(' compstmt ')' | primary '(' nonnull_exprlist ')' | primary LEFT_RIGHT | primary '[' expr ']' | primary PLUSPLUS | primary MINUSMINUS | THIS | CV_QUALIFIER '(' nonnull_exprlist ')' | functional_cast | DYNAMIC_CAST '<' type_id '>' '(' expr ')' | STATIC_CAST '<' type_id '>' '(' expr ')' | REINTERPRET_CAST '<' type_id '>' '(' expr ')' | CONST_CAST '<' type_id '>' '(' expr ')' | TYPEID '(' expr ')' | TYPEID '(' type_id ')' | global_scope IDENTIFIER | global_scope operator_name | overqualified_id | overqualified_id '(' nonnull_exprlist ')' | overqualified_id LEFT_RIGHT | object object_template_id | object object_template_id '(' nonnull_exprlist ')' | object object_template_id LEFT_RIGHT | object unqualified_id | object overqualified_id | object unqualified_id '(' nonnull_exprlist ')' | object unqualified_id LEFT_RIGHT | object overqualified_id '(' nonnull_exprlist ')' | object overqualified_id LEFT_RIGHT | object '~' TYPESPEC LEFT_RIGHT | object TYPESPEC SCOPE '~' TYPESPEC LEFT_RIGHT | object error
+86: cast_expr	-> unary_expr | regcast_or_absdcl unary_expr | regcast_or_absdcl '{' initlist maybecomma '}'
+87: new	-> NEW | global_scope NEW
+88: new_type_id	-> type_specifier_seq new_declarator | type_specifier_seq | '(' type_id ')' '[' expr ']'
+89: new_initializer	-> '(' nonnull_exprlist ')' | LEFT_RIGHT | '(' typespec ')' | '=' init
+90: new_placement	-> '(' nonnull_exprlist ')' | '{' nonnull_exprlist '}'
+91: delete	-> DELETE | global_scope delete
+92: regcast_or_absdcl	-> '(' type_id ')' | regcast_or_absdcl '(' type_id ')'
+93: initlist	-> init | initlist ',' init | '[' expr_no_commas ']' init | initlist ',' CASE expr_no_commas ':' init | identifier ':' init | initlist ',' identifier ':' init
+94: maybecomma	-> /* Empty */ | ','
+95: xexpr	-> /* Empty */ | expr | error
+96: notype_unqualified_id	-> '~' see_typename identifier | template_id | operator_name | IDENTIFIER | PTYPENAME | NSNAME
+97: see_typename	-> /* Empty */
+98: template_id	-> PFUNCNAME '<' template_arg_list template_close_bracket | PFUNCNAME '<' template_close_bracket | operator_name '<' template_arg_list template_close_bracket | operator_name '<' template_close_bracket
+99: operator_name	-> operator '*' | operator '/' | operator '%' | operator '+' | operator '-' | operator '&' | operator '|' | operator '^' | operator '~' | operator ',' | operator ARITHCOMPARE | operator '<' | operator '>' | operator EQCOMPARE | operator ASSIGN | operator '=' | operator LSHIFT | operator RSHIFT | operator PLUSPLUS | operator MINUSMINUS | operator ANDAND | operator OROR | operator '!' | operator '?' ':' | operator MIN_MAX | operator POINTSAT | operator POINTSAT_STAR | operator LEFT_RIGHT | operator '[' ']' | operator NEW | operator DELETE | operator NEW '[' ']' | operator DELETE '[' ']' | operator type_specifier_seq conversion_declarator | operator error
+100: object_template_id	-> TEMPLATE identifier '<' template_arg_list template_close_bracket | TEMPLATE PFUNCNAME '<' template_arg_list template_close_bracket | TEMPLATE operator_name '<' template_arg_list template_close_bracket
+101: expr_or_declarator	-> notype_unqualified_id | '*' expr_or_declarator | '&' expr_or_declarator | '(' expr_or_declarator ')'
+102: notype_template_declarator	-> IDENTIFIER '<' template_arg_list template_close_bracket | NSNAME '<' template_arg_list template_close_bracket
+103: direct_notype_declarator	-> complex_direct_notype_declarator | notype_unqualified_id | notype_template_declarator | '(' expr_or_declarator ')'
+104: complex_direct_notype_declarator	-> direct_notype_declarator maybe_parmlist cv_qualifiers exception_specification_opt | '(' complex_notype_declarator ')' | direct_notype_declarator '[' nonmomentary_expr ']' | direct_notype_declarator '[' ']' | notype_qualified_id | nested_name_specifier notype_template_declarator
+105: boolean.literal	-> CXX_TRUE | CXX_FALSE
+106: compstmt	-> '{' .pushlevel compstmtend .poplevel
+107: functional_cast	-> typespec '(' nonnull_exprlist ')' | typespec '(' expr_or_declarator ')' | typespec fcast_or_absdcl
+108: overqualified_id	-> notype_qualified_id | global_scope notype_qualified_id
+109: object	-> primary '.' | primary POINTSAT
+110: decl	-> typespec initdecls ';' | typed_declspecs initdecls ';' | declmods notype_initdecls ';' | typed_declspecs ';' | declmods ';' | extension decl
+111: after_type_declarator	-> '*' nonempty_cv_qualifiers after_type_declarator | '&' nonempty_cv_qualifiers after_type_declarator | '*' after_type_declarator | '&' after_type_declarator | ptr_to_mem cv_qualifiers after_type_declarator | direct_after_type_declarator
+112: fcast_or_absdcl	-> LEFT_RIGHT | fcast_or_absdcl LEFT_RIGHT
+113: typed_typespecs	-> typespec | nonempty_cv_qualifiers typespec | typespec reserved_typespecquals | nonempty_cv_qualifiers typespec reserved_typespecquals
+114: absdcl	-> '*' nonempty_cv_qualifiers absdcl | '*' absdcl | '*' nonempty_cv_qualifiers | '*' | '&' nonempty_cv_qualifiers absdcl | '&' absdcl | '&' nonempty_cv_qualifiers | '&' | ptr_to_mem cv_qualifiers | ptr_to_mem cv_qualifiers absdcl | direct_abstract_declarator
+115: nonempty_cv_qualifiers	-> CV_QUALIFIER | nonempty_cv_qualifiers CV_QUALIFIER
+116: typed_declspecs1	-> declmods typespec | typespec reserved_declspecs | typespec reserved_typespecquals reserved_declspecs | declmods typespec reserved_declspecs | declmods typespec reserved_typespecquals | declmods typespec reserved_typespecquals reserved_declspecs
+117: reserved_declspecs	-> SCSPEC | reserved_declspecs typespecqual_reserved | reserved_declspecs SCSPEC | reserved_declspecs attributes | attributes
+118: reserved_typespecquals	-> typespecqual_reserved | reserved_typespecquals typespecqual_reserved
+119: typespecqual_reserved	-> TYPESPEC | CV_QUALIFIER | structsp
+120: attributes	-> attribute | attributes attribute
+121: structsp	-> ENUM identifier '{' enumlist maybecomma_warn '}' | ENUM identifier '{' '}' | ENUM '{' enumlist maybecomma_warn '}' | ENUM '{' '}' | ENUM identifier | ENUM complex_type_name | TYPENAME_KEYWORD typename_sub | class_head left_curly opt.component_decl_list '}' maybe_attribute pending_defargs pending_inlines | class_head
+122: complete_type_name	-> nonnested_type | nested_type | global_scope nested_type
+123: initdcl0	-> declarator maybeasm maybe_attribute '=' init | declarator maybeasm maybe_attribute
+124: initdcl	-> declarator maybeasm maybe_attribute '=' init | declarator maybeasm maybe_attribute
+125: notype_initdcl0	-> notype_declarator maybeasm maybe_attribute '=' init | notype_declarator maybeasm maybe_attribute
+126: nomods_initdcl0	-> notype_declarator maybeasm maybe_attribute '=' init | notype_declarator maybeasm maybe_attribute
+127: attribute	-> ATTRIBUTE '(' '(' attribute_list ')' ')'
+128: attribute_list	-> attrib | attribute_list ',' attrib
+129: attrib	-> /* Empty */ | any_word | any_word '(' IDENTIFIER ')' | any_word '(' IDENTIFIER ',' nonnull_exprlist ')' | any_word '(' nonnull_exprlist ')'
+130: any_word	-> identifier | SCSPEC | TYPESPEC | CV_QUALIFIER
+131: identifiers_or_typenames	-> identifier | identifiers_or_typenames ',' identifier
+132: fn.defpen	-> PRE_PARSED_FUNCTION_DECL
+133: pending_inline	-> fn.defpen maybe_return_init ctor_initializer_opt compstmt_or_error | fn.defpen maybe_return_init function_try_block | fn.defpen maybe_return_init error
+134: pending_inlines	-> /* Empty */ | pending_inlines pending_inline eat_saved_input
+135: defarg_again	-> DEFARG_MARKER expr_no_commas END_OF_SAVED_INPUT | DEFARG_MARKER error END_OF_SAVED_INPUT
+136: pending_defargs	-> /* Empty */ | pending_defargs defarg_again | pending_defargs error
+137: enumlist	-> enumerator | enumlist ',' enumerator
+138: maybecomma_warn	-> /* Empty */ | ','
+139: complex_type_name	-> global_scope type_name | nested_type | global_scope nested_type
+140: class_head	-> unnamed_class_head | named_class_head
+141: left_curly	-> '{'
+142: opt.component_decl_list	-> self_reference | self_reference component_decl_list | opt.component_decl_list VISSPEC ':' component_decl_list | opt.component_decl_list VISSPEC ':'
+143: named_class_head_sans_basetype	-> aggr identifier
+144: named_class_head_sans_basetype_defn	-> aggr identifier_defn
+145: named_complex_class_head_sans_basetype	-> aggr nested_name_specifier identifier | aggr global_scope nested_name_specifier identifier | aggr global_scope identifier | aggr template_type | aggr nested_name_specifier template_type
+146: do_xref_defn	-> /* Empty */
+147: named_class_head	-> named_class_head_sans_basetype | named_class_head_sans_basetype_defn do_xref_defn maybe_base_class_list | named_complex_class_head_sans_basetype maybe_base_class_list
+148: maybe_base_class_list	-> /* Empty */ | ':' see_typename | ':' see_typename base_class_list
+149: unnamed_class_head	-> aggr '{' '{'
+150: base_class_list	-> base_class | base_class_list ',' see_typename base_class
+151: base_class	-> base_class.1 | base_class_access_list see_typename base_class.1
+152: base_class.1	-> typename_sub | nonnested_type | SIGOF '(' expr ')' | SIGOF '(' type_id ')'
+153: base_class_access_list	-> VISSPEC see_typename | SCSPEC see_typename | base_class_access_list VISSPEC see_typename | base_class_access_list SCSPEC see_typename
+154: self_reference	-> /* Empty */
+155: component_decl_list	-> component_decl | component_decl_list component_decl
+156: component_decl	-> component_decl_1 ';' | component_decl_1 '}' '}' | fn.def2 ':' | fn.def2 TRY | fn.def2 RETURN | fn.def2 '{' | ';' | extension component_decl
+157: component_decl_1	-> typed_declspecs components | declmods notype_components | notype_declarator maybeasm maybe_attribute maybe_init | constructor_declarator maybeasm maybe_attribute maybe_init | ':' expr_no_commas | error | declmods component_constructor_declarator maybeasm maybe_attribute maybe_init | component_constructor_declarator maybeasm maybe_attribute maybe_init | using_decl | template_header component_decl_1
+158: components	-> /* Empty */ | component_declarator0 | components ',' component_declarator
+159: notype_components	-> /* Empty */ | notype_component_declarator0 | notype_components ',' notype_component_declarator
+160: component_declarator0	-> after_type_component_declarator0 | notype_component_declarator0
+161: component_declarator	-> after_type_component_declarator | notype_component_declarator
+162: notype_component_declarator0	-> notype_declarator maybeasm maybe_attribute maybe_init | constructor_declarator maybeasm maybe_attribute maybe_init | IDENTIFIER ':' expr_no_commas maybe_attribute | ':' expr_no_commas maybe_attribute
+163: notype_component_declarator	-> notype_declarator maybeasm maybe_attribute maybe_init | IDENTIFIER ':' expr_no_commas maybe_attribute | ':' expr_no_commas maybe_attribute
+164: after_type_component_declarator0	-> after_type_declarator maybeasm maybe_attribute maybe_init | TYPENAME ':' expr_no_commas maybe_attribute
+165: after_type_component_declarator	-> after_type_declarator maybeasm maybe_attribute maybe_init | TYPENAME ':' expr_no_commas maybe_attribute
+166: enumerator	-> identifier | identifier '=' expr_no_commas
+167: new_declarator	-> '*' cv_qualifiers new_declarator | '*' cv_qualifiers | '&' cv_qualifiers new_declarator | '&' cv_qualifiers | ptr_to_mem cv_qualifiers | ptr_to_mem cv_qualifiers new_declarator | direct_new_declarator
+168: suspend_mom	-> /* Empty */
+169: nonmomentary_expr	-> suspend_mom expr
+170: maybe_parmlist	-> suspend_mom '(' nonnull_exprlist ')' | suspend_mom '(' parmlist ')' | suspend_mom LEFT_RIGHT | suspend_mom '(' error ')'
+171: ptr_to_mem	-> nested_name_specifier '*' | global_scope nested_name_specifier '*'
+172: direct_after_type_declarator	-> direct_after_type_declarator maybe_parmlist cv_qualifiers exception_specification_opt | direct_after_type_declarator '[' nonmomentary_expr ']' | direct_after_type_declarator '[' ']' | '(' after_type_declarator ')' | nested_name_specifier type_name | type_name
+173: type_name	-> TYPENAME | SELFNAME | template_type
+174: nested_type	-> nested_name_specifier type_name
+175: complex_notype_declarator	-> '*' nonempty_cv_qualifiers notype_declarator | '&' nonempty_cv_qualifiers notype_declarator | '*' complex_notype_declarator | '&' complex_notype_declarator | ptr_to_mem cv_qualifiers notype_declarator | complex_direct_notype_declarator
+176: notype_qualified_id	-> nested_name_specifier notype_unqualified_id | nested_name_specifier object_template_id
+177: nested_name_specifier_1	-> TYPENAME SCOPE | SELFNAME SCOPE | NSNAME SCOPE | template_type SCOPE
+178: typename_sub0	-> typename_sub1 identifier
+179: typename_sub1	-> typename_sub2 | typename_sub1 typename_sub2
+180: typename_sub2	-> TYPENAME SCOPE | SELFNAME SCOPE | template_type SCOPE | PTYPENAME SCOPE | IDENTIFIER SCOPE | NSNAME SCOPE
+181: direct_new_declarator	-> '[' expr ']' | direct_new_declarator '[' nonmomentary_expr ']'
+182: direct_abstract_declarator	-> '(' absdcl ')' | PAREN_STAR_PAREN | direct_abstract_declarator '(' parmlist ')' cv_qualifiers exception_specification_opt | direct_abstract_declarator LEFT_RIGHT cv_qualifiers exception_specification_opt | direct_abstract_declarator '[' nonmomentary_expr ']' | direct_abstract_declarator '[' ']' | '(' complex_parmlist ')' cv_qualifiers exception_specification_opt | regcast_or_absdcl cv_qualifiers exception_specification_opt | fcast_or_absdcl cv_qualifiers exception_specification_opt | '[' nonmomentary_expr ']' | '[' ']'
+183: complex_parmlist	-> parms | parms_comma ELLIPSIS | parms ELLIPSIS | type_id ELLIPSIS | ELLIPSIS | TYPENAME_ELLIPSIS | parms TYPENAME_ELLIPSIS | type_id TYPENAME_ELLIPSIS | parms ':' | type_id ':'
+184: stmt	-> compstmt | simple_stmt
+185: errstmt	-> error ';'
+186: .pushlevel	-> /* Empty */
+187: .poplevel	-> /* Empty */
+188: label_decls	-> label_decl | label_decls label_decl
+189: label_decl	-> LABEL identifiers_or_typenames ';'
+190: simple_if	-> IF .pushlevel paren_cond_or_null implicitly_scoped_stmt
+191: implicitly_scoped_stmt	-> compstmt | .pushlevel simple_stmt .poplevel
+192: for.init.statement	-> xexpr ';' | decl | '{' compstmtend
+193: maybe_cv_qualifier	-> /* Empty */ | CV_QUALIFIER
+194: asm_operands	-> /* Empty */ | nonnull_asm_operands
+195: asm_clobbers	-> STRING | asm_clobbers ',' STRING
+196: label_colon	-> IDENTIFIER ':' | PTYPENAME ':' | TYPENAME ':' | SELFNAME ':'
+197: try_block	-> TRY compstmt handler_seq
+198: handler_seq	-> handler | handler_seq handler
+199: handler	-> CATCH .pushlevel handler_args compstmt .poplevel
+200: handler_args	-> '(' ELLIPSIS ')' | '(' parm ')'
+201: nonnull_asm_operands	-> asm_operand | nonnull_asm_operands ',' asm_operand
+202: asm_operand	-> STRING '(' expr ')'
+203: parms	-> named_parm | parm defarg | parms_comma full_parm | parms_comma bad_parm | parms_comma bad_parm '=' init
+204: parms_comma	-> parms ',' | type_id ','
+205: defarg	-> '=' defarg1
+206: defarg1	-> DEFARG | init
+207: named_parm	-> typed_declspecs1 declarator | typed_typespecs declarator | typespec declarator | typed_declspecs1 absdcl | typed_declspecs1 | declmods notype_declarator
+208: full_parm	-> parm | parm defarg
+209: bad_parm	-> /* Empty */ | notype_declarator
+210: ansi_raise_identifiers	-> ansi_raise_identifier | ansi_raise_identifiers ',' ansi_raise_identifier
+211: ansi_raise_identifier	-> type_id
+212: conversion_declarator	-> /* Empty */ | '*' cv_qualifiers conversion_declarator | '&' cv_qualifiers conversion_declarator | ptr_to_mem cv_qualifiers conversion_declarator
+213: operator	-> OPERATOR
+>>> There are 112 terminals and 214 non-terminals 
+>>> Total McCabe complexity is: 568
+McCabe Metrics:
+   1   1   0   1   0   0   0   1  12   2   1   8   1   1   1   4   3   2   1   0
+   2   1   1   3   3   4   4   1  24   1   5   1   1   1   7   1   0   0   2   2
+   4   1   0   7   1   2   1   2   1   1   5   3   7   0   1   1   0   3   7   2
+   1   1   2   6   4   1   1   1   4   1   3   1   1   1   2   1   1   1   4   3
+   1   3   1  24  23  38   2   1   2   3   1   1   1   5   1   2   5   0   3  34
+   2   3   1   3   5   1   0   2   1   1   5   5   1   3  10   1   5   4   1   2
+   1   8   2   1   1   1   1   0   1   4   3   1   0   2   1   1   2   1   1   2
+   1   0   3   0   0   4   0   2   2   0   1   1   3   3   0   1   7   9   2   2
+   1   1   3   2   1   1   1   6   0   0   3   1   5   2   0   5   1   3   0   1
+   5   1  10   9   1   0   0   0   1   0   0   1   2   1   1   1   3   0   1   0
+   1   1   0   4   1   0   1   5   1   1   1   0   3   0
+>>> Total Halstead volume is: 590930
+>>> Average RHS Size is: 8.57477
+GRAMMATICAL LEVELS:
+DERIVES-IN-ONE RELATION
+  0:  *                                                                                                                                                                                                                    
+  1:  **                                                                                                                                                                                                                   
+  2:         *                                                                                                                                                                                                             
+  3:  *                                                                                                                                                                                                                    
+  4:                                                                                                                                                                                                                       
+  5:                                                                                                                                                                                                                       
+  6:                                                                                                                                                                                                                       
+  7:                                                                                                                                                                                                                       
+  8:    ***************                                                                                                                                                                                                    
+  9:                                    *  * ***                                                                                                                                                                           
+ 10:                                                                                                                                                                                                                       
+ 11:                              ******                                                                                                                                                                                   
+ 12:         *            *                                                                                                                                                                                                
+ 13:              *                                                                                                                                                                                                        
+ 14:               *                                                                                                                                                                                                       
+ 15:                                                                                                                                                                                                                       
+ 16:                   ***                                                                                                                                                                                                 
+ 17:                   ***                                                                                                                                                                                                 
+ 18:                     *                       *                                                       *                                                                                                                 
+ 19:                                                                                                                                                                                                                       
+ 20:                                                                                                 *                                                                                                                     
+ 21:                       *                                                                                                                                                                                               
+ 22:                       **                                                                                                                                                                                              
+ 23:                         * ***                                                                                                                                                                                         
+ 24:                *         *                                                                                                                                                                                            
+ 25:                          *                                                                                                                                                                                            
+ 26:                                                                *                                                 ***                                                                                                  
+ 27:                           *                                                                                                                                                                                    *      
+ 28:                             *                                                         *        *                                                                                                                      
+ 29:                              *                                                                                              * *                                                                                       
+ 30:                               *                                                                                    *    *                                                                                             
+ 31:                                *                                                                                            **                                                                                        
+ 32:                                                                                                                  *  *                                                                                                 
+ 33:                                  *                                                                                         **                                                                                         
+ 34:                                 *          *     **            *                                                                                                                                                      
+ 35:                                     **                                                                                                                                                                                
+ 36:                                                                                                                                                                                                                       
+ 37:                                                         **                                                                                                                                                            
+ 38:                                        *                                                                                                                                                                              
+ 39:                                                      ***                                                                                                                                                              
+ 40:                               * *          *     **                                                                                                                                                                   
+ 41:                                                                                                           *                                                                                                           
+ 42:                                    *                                                                      *                                                                                           *               
+ 43:                    *                        *****                                                                                                                                                                     
+ 44:                                             *                                                                                                                                    *                                    
+ 45:                           *                                                                                                                                                            *                              
+ 46:                                               *                                                                                                                                                                       
+ 47:                                                                                                                                                                                                                   *   
+ 48:                                                                  **                                                                                                                                                   
+ 49:                                                   *                                                            *                                                                                                      
+ 50:                                               *   *                                                    *           *                                                       *                                          
+ 51:                                              ****                                                                                                                                                                     
+ 52:                      *        * *          *     ****                                                                                                                                                                 
+ 53:                                                                                                                                                                                                                       
+ 54:                                                                               *                                                                                                                                       
+ 55:                             *                                         *                                                                                                                                               
+ 56:                                                                                                                                                                                                                       
+ 57:                                                          **                                                                                                                                                           
+ 58:                                                        *   ***                                                                                                                                                        
+ 59:                                                                                                                                                                                                                       
+ 60:                    *                                                                                                                                                         *                                        
+ 61:                    *                                                                                                                                                              *                                   
+ 62:                                                                                                                                                                                                                       
+ 63:                           *                                          *                                                   **                                                                                           
+ 64:                                                 *                **                                                                                                                                                   
+ 65:                                                                  * *                                                                                                                                                  
+ 66:                                                                                                                                                                                                                       
+ 67:                           * *                                                                                                                                                                                         
+ 68:                                                                                                                                                                                                                       
+ 69:                             *                                         *                                                                                                                                               
+ 70:                             *                                         *                                                                                                                                               
+ 71:                                                                      *                                                                                                                                                
+ 72:                                                                          *                                                                                                                                            
+ 73:                                                  *                   *     ****                                                                                                                                       
+ 74:                                                                          *                                                                                                                                            
+ 75:                                                                                                                  * *                                                                                                  
+ 76:        *     *                                                                                                                                                                                                        
+ 77:                                                                                                                         *                                                                                             
+ 78:                             *                                                                *                                                                                                                        
+ 79:                                                                                 **                                                                                                                                    
+ 80:                                                                                                                                                                                             *                         
+ 81:                                                                                  *                                                                                                      **                            
+ 82:                                                                                *   *                                                                                                                                  
+ 83:        *     * *            *                                        * ****       *            *              *                                                                         * **  ********                
+ 84:       *        *          *                                         **              ********                                                                                                                          
+ 85:              *     **     *                            *             *               *          *  ***   *****                                                                                                        
+ 86:                                                                                     *       ***                                                                                                                       
+ 87:                    *                                                                                                                                                                                                  
+ 88:                           *                                          *     *                                                                                           *                                              
+ 89:                                                        *       *              *                                                                                                                                       
+ 90:                                                        *                                                                                                                                                              
+ 91:                    *                                                                       *                                                                                                                          
+ 92:                           *                                                                 *                                                                                                                         
+ 93:                *            *                                                 *              *                                                                                                                        
+ 94:                                                                                                                                                                                                                       
+ 95:                                                                      *                                                                                                                                                
+ 96:                *                                                                                 ***                                                                                                                  
+ 97:                                                                                                                                                                                                                       
+ 98:                                                                  **                                *                                                                                                                  
+ 99:                                                                            *                                                                                                                                        **
+100:                *                                                 **                                *                                                                                                                  
+101:                                                                                                 *    *                                                                                                                
+102:                                                                  **                                                                                                                                                   
+103:                                                                                                 *    ** *                                                                                                             
+104:                                             * **                                                      **                                                                 **    **                                     
+105:                                                                                                                                                                                                                       
+106:                                                                                *                                                                                                          **                          
+107:                                                        *       *                                     *          *                                                                                                     
+108:                    *                                                                                                                                                            *                                     
+109:                                                                                      *                                                                                                                                
+110:       *                       ****                             *                                              *                                                                                                       
+111:                                               *                                                                *   *                                                       **                                         
+112:                                                                                                                 *                                                                                                     
+113:                                                                *                                                   *  *                                                                                               
+114:                                               *                                                                   **                                                       *          *                               
+115:                                                                                                                    *                                                                                                  
+116:                               *                                *                                                     **                                                                                               
+117:                                                                                                                      * **                                                                                             
+118:                                                                                                                       **                                                                                              
+119:                                                                                                                          *                                                                                            
+120:                                                                                                                         *      *                                                                                      
+121:                *                                             *               *                                                        * *******                                                                       
+122:                    *                                        *                                                                                                                 *                                       
+123:                                                  *                          ***                                                                                                                                       
+124:                                                  *                          ***                                                                                                                                       
+125:                                                   *                         ***                                                                                                                                       
+126:                                                   *                         ***                                                                                                                                       
+127:                                                                                                                                 *                                                                                     
+128:                                                                                                                                 **                                                                                    
+129:                                                        *                                                                          *                                                                                   
+130:                *                                                                                                                                                                                                      
+131:                *                                                                                                                   *                                                                                  
+132:                                                                                                                                                                                                                       
+133:                                    *  *  **                                                                                         *                                                                                 
+134:           *                                                                                                                          **                                                                               
+135:                             *                                                                                                                                                                                         
+136:                                                                                                                                        **                                                                             
+137:                                                                                                                                          *                            *                                               
+138:                                                                                                                                                                                                                       
+139:                    *                                                                                                                                                         **                                       
+140:                                                                                                                                                    * *                                                                
+141:                                                                                                                                                                                                                       
+142:                                                                                                                                               *           **                                                          
+143:                *         *                                                                                                                                                                                            
+144:                          *                                    *                                                                                                                                                       
+145:                *   *     *                  *                   *                                                                                                                                                     
+146:                                                                                                                                                                                                                       
+147:                                                                                                                                                **** *                                                                 
+148:                                                                                                  *                                                    *                                                               
+149:                          *                                                                                                                                                                                            
+150:                                                                                                  *                                                    **                                                              
+151:                                                                                                  *                                                      **                                                            
+152:                           *                                 **       *                                                                                                                                                
+153:                                                                                                  *                                                       *                                                            
+154:                                                                                                                                                                                                                       
+155:                                                                                                                                                            **                                                         
+156:       *                                             *                                                                                                       **                                                        
+157:                  *   *      * * *          *      **  *                     **                                                                               ***                                                      
+158:                                                                                                                                                               * **                                                    
+159:                                                                                                                                                                *  **                                                  
+160:                                                                                                                                                                   * *                                                 
+161:                                                                                                                                                                    * *                                                
+162:                             *              *      *   *                     **                                                                                                                                        
+163:                             *                     *   *                     **                                                                                                                                        
+164:                             *                         *                     **                                 *                                                                                                      
+165:                             *                         *                     **                                 *                                                                                                      
+166:                *            *                                                                                                                                                                                         
+167:                                               *                                                                                                                        *   *         *                                
+168:                                                                                                                                                                                                                       
+169:                                                                      *                                                                                                  *                                             
+170:                                              *         *                                                                                                                *                                             
+171:                    *                        *                                                                                                                                                                         
+172:                                             * **                                                               *                                                         ** **                                        
+173:                                                                 *                                                                                                                                                     
+174:                                             *                                                                                                                                *                                        
+175:                                               *   *                                                     *          *                                                       *   *                                      
+176:                                             *                                                   *   *                                                                                                                 
+177:                                                                 *                                                                                                                                                     
+178:                *                                                                                                                                                                   *                                  
+179:                                                                                                                                                                                    **                                 
+180:                                                                 *                                                                                                                                                     
+181:                                                                      *                                                                                                   *           *                                
+182:                                              ***                                            *                   * *                                                      *            **                              
+183:                           *                                                                                                                                                                                **         
+184:                                                                                    *                      *                                                                                                           
+185:                                                                                                                                                                                                                       
+186:                                                                                                                                                                                                                       
+187:                                                                                                                                                                                                                       
+188:                                                                                                                                                                                             **                        
+189:                                                                                                                                    *                                                                                  
+190:                                                                         *                                                                                                                 *    *                      
+191:                                                                                    *                      *                                                                               **                          
+192:                                                                                *               *              *                                                                                                       
+193:                                                                                                                                                                                                                       
+194:                                                                                                                                                                                                          *            
+195:                                                                                                                                                                                                    *                  
+196:                                                                                                                                                                                                                       
+197:                                                                                                           *                                                                                           *               
+198:                                                                                                                                                                                                       **              
+199:                                                                                                           *                                                                               **            *             
+200:                            *                                                                                                                                                                                          
+201:                                                                                                                                                                                                          **           
+202:                                                                      *                                                                                                                                                
+203:                            *                                                  *                                                                                                                             ** ***    
+204:                           *                                                                                                                                                                                *          
+205:                                                                                                                                                                                                               *       
+206:                                                                               *                                                                                                                                       
+207:                               *                  **            *                                                 ** *                                                                                                 
+208:                            *                                                                                                                                                                                 *        
+209:                                                   *                                                                                                                                                                   
+210:                                                                                                                                                                                                                   **  
+211:                           *                                                                                                                                                                                           
+212:                                               *                                                                                                                            *                                        * 
+213:                                                                                                                                                                                                                       
+DERIVES-IN-MANY RELATION
+  0:  *********************************************************************************************************************************************************************************************************************
+  1:  *********************************************************************************************************************************************************************************************************************
+  2:  *********************************************************************************************************************************************************************************************************************
+  3:  *********************************************************************************************************************************************************************************************************************
+  4:                                                                                                                                                                                                                       
+  5:                                                                                                                                                                                                                       
+  6:                                                                                                                                                                                                                       
+  7:                                                                                                                                                                                                                       
+  8:  *********************************************************************************************************************************************************************************************************************
+  9:       **  *  * * ************ **** ******************************************************************************************* ***************************************************************************************
+ 10:                                                                                                                                                                                                                       
+ 11:       **  *  * * *********************** *****************************************************************************************************************************************************************************
+ 12:  *********************************************************************************************************************************************************************************************************************
+ 13:              *                                                                                                                                                                                                        
+ 14:               *                                                                                                                                                                                                       
+ 15:                                                                                                                                                                                                                       
+ 16:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 17:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 18:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 19:                                                                                                                                                                                                                       
+ 20:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 21:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 22:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 23:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 24:                *         *                                                                                                                                                                                            
+ 25:                          *                                                                                                                                                                                            
+ 26:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 27:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 28:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 29:       **  *  * * ***************** ***** *****************************************************************************************************************************************************************************
+ 30:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 31:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 32:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 33:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 34:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 35:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 36:                                                                                                                                                                                                                       
+ 37:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 38:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 39:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 40:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 41:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 42:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 43:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 44:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 45:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 46:                                               *                                                                                                                                                                       
+ 47:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 48:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 49:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 50:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 51:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 52:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 53:                                                                                                                                                                                                                       
+ 54:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 55:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 56:                                                                                                                                                                                                                       
+ 57:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 58:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 59:                                                                                                                                                                                                                       
+ 60:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 61:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 62:                                                                                                                                                                                                                       
+ 63:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 64:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 65:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 66:                                                                                                                                                                                                                       
+ 67:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 68:                                                                                                                                                                                                                       
+ 69:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 70:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 71:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 72:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 73:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 74:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 75:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 76:        *     *                                                                                                                                                                                                        
+ 77:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 78:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 79:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 80:                *                                                                                                                   *                                                        **                        
+ 81:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 82:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 83:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 84:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 85:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 86:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 87:                    *                                                                                                                                                                                                  
+ 88:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 89:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 90:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 91:                    *                                                                       *                                                                                                                          
+ 92:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 93:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 94:                                                                                                                                                                                                                       
+ 95:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 96:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 97:                                                                                                                                                                                                                       
+ 98:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+ 99:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+100:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+101:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+102:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+103:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+104:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+105:                                                                                                                                                                                                                       
+106:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+107:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+108:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+109:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+110:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+111:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+112:                                                                                                                 *                                                                                                     
+113:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+114:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+115:                                                                                                                    *                                                                                                  
+116:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+117:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+118:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+119:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+120:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+121:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+122:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+123:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+124:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+125:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+126:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+127:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+128:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+129:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+130:                *                                                                                                                                                                                                      
+131:                *                                                                                                                   *                                                                                  
+132:                                                                                                                                                                                                                       
+133:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+134:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+135:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+136:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+137:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+138:                                                                                                                                                                                                                       
+139:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+140:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+141:                                                                                                                                                                                                                       
+142:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+143:                *         *                                                                                                                                                                                            
+144:                          *                                    *                                                                                                                                                       
+145:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+146:                                                                                                                                                                                                                       
+147:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+148:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+149:                          *                                                                                                                                                                                            
+150:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+151:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+152:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+153:                                                                                                  *                                                       *                                                            
+154:                                                                                                                                                                                                                       
+155:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+156:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+157:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+158:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+159:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+160:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+161:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+162:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+163:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+164:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+165:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+166:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+167:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+168:                                                                                                                                                                                                                       
+169:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+170:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+171:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+172:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+173:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+174:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+175:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+176:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+177:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+178:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+179:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+180:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+181:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+182:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+183:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+184:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+185:                                                                                                                                                                                                                       
+186:                                                                                                                                                                                                                       
+187:                                                                                                                                                                                                                       
+188:                *                                                                                                                   *                                                        **                        
+189:                *                                                                                                                   *                                                                                  
+190:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+191:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+192:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+193:                                                                                                                                                                                                                       
+194:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+195:                                                                                                                                                                                                    *                  
+196:                                                                                                                                                                                                                       
+197:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+198:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+199:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+200:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+201:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+202:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+203:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+204:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+205:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+206:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+207:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+208:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+209:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+210:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+211:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+212:       **  *  * * ************ **** ***** ************************************************************************************* ***************************************************************************************
+213:                                                                                                                                                                                                                       
+Fenton impurity is: 0.687694
+>>> Fenton closed impurity is: 71.4541
+Class #1: (size = 5) 
+	extdefs	lang_extdef	extdefs_opt	extdef	template_def
+Class #13: (size = 152) 
+	using_decl	qualified_id	unqualified_id	template_header	template_parm_list	template_parm	type_id
+	parm	expr_no_commas	declmods	notype_initdecls	typed_declspecs	initdecls	ctor_initializer_opt
+	base_init	maybe_return_init	return_init	compstmt_or_error	function_try_block	constructor_declarator	nested_name_specifier
+	parmlist	exception_specification_opt	self_template_type	declarator	notype_declarator	component_constructor_declarator	fn.def2
+	maybe_init	nonnull_exprlist	member_init_list	member_init	nonnested_type	typename_sub	typespec
+	template_type	template_arg_list	template_arg	expr	nontrivial_exprlist	paren_expr_or_null	paren_cond_or_null
+	condition	xcond	type_specifier_seq	maybe_attribute	init	compstmtend	stmts
+	already_scoped_stmt	simple_stmt	unary_expr	primary	cast_expr	new_type_id	new_initializer
+	new_placement	regcast_or_absdcl	initlist	xexpr	notype_unqualified_id	template_id	operator_name
+	object_template_id	expr_or_declarator	notype_template_declarator	direct_notype_declarator	complex_direct_notype_declarator	compstmt	functional_cast
+	overqualified_id	object	decl	after_type_declarator	typed_typespecs	absdcl	typed_declspecs1
+	reserved_declspecs	reserved_typespecquals	typespecqual_reserved	attributes	structsp	complete_type_name	initdcl0
+	initdcl	notype_initdcl0	attribute	attribute_list	attrib	pending_inline	pending_inlines
+	defarg_again	pending_defargs	enumlist	complex_type_name	class_head	opt.component_decl_list	named_complex_class_head_sans_basetype
+	named_class_head	maybe_base_class_list	base_class_list	base_class	base_class.1	component_decl_list	component_decl
+	component_decl_1	components	notype_components	component_declarator0	component_declarator	notype_component_declarator0	notype_component_declarator
+	after_type_component_declarator0	after_type_component_declarator	enumerator	new_declarator	nonmomentary_expr	maybe_parmlist	ptr_to_mem
+	direct_after_type_declarator	type_name	nested_type	complex_notype_declarator	notype_qualified_id	nested_name_specifier_1	typename_sub0
+	typename_sub1	typename_sub2	direct_new_declarator	direct_abstract_declarator	complex_parmlist	stmt	simple_if
+	implicitly_scoped_stmt	for.init.statement	asm_operands	try_block	handler_seq	handler	handler_args
+	nonnull_asm_operands	asm_operand	parms	parms_comma	defarg	defarg1	named_parm
+	full_parm	bad_parm	ansi_raise_identifiers	ansi_raise_identifier	conversion_declarator
+>>> There are 59 equivalence classes, 2 of which are non-singleton
+As a percentage of the number of non-terminals, there are 27.6% equivalence classes 
+>>> (Depth) Largest equivalence class has 152 non-terminals
+Varju height metric is: 18.6
+EQUIVALENCE GRAPH (size 59)
+0:  **********************************************************
+1:   *********************************************************
+2:                                                            
+3:                                                            
+4:                                                            
+5:                                                            
+6:     ** * * * ****  ****************** *********************
+7:                                                            
+8:     ** * * * ******* **************************************
+9:                                                            
+10:                                                            
+11:                                                            
+12:     ** * * * ****  * **************** *********************
+13:     ** * * *  ***  * **************** *********************
+14:                                                            
+15:            *    *                                          
+16:                                                            
+17:     ** * * * ****  * **************************************
+18:     ** * * * ****  * **************** *********************
+19:                                                            
+20:     ** * * * ****  * **************** *********************
+21:                                                            
+22:                                                            
+23:                                                            
+24:                                                            
+25:                                                            
+26:                                                            
+27:                                                            
+28:      *   *                                                 
+29:            *                           *             **    
+30:               *                                            
+31:               *                                            
+32:                                                            
+33:                                                            
+34:                                                            
+35:                                                            
+36:                                                            
+37:     ** * * * ****  * **************** *********************
+38:            *                                               
+39:            *                                               
+40:                                                            
+41:                                                            
+42:                                                            
+43:            *    *                                          
+44:                 *        *                                 
+45:                                                            
+46:                 *                                          
+47:                                  *                         
+48:                                                            
+49:                                                            
+50:                                                            
+51:                                                            
+52:                                                            
+53:            *                           *              *    
+54:            *                           *                   
+55:                                                            
+56:                                                            
+57:                                                            
+58:                                                            

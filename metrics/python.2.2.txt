@@ -1,0 +1,266 @@
+The grammar: 
+START SYMBOL: Start_symbols	Not used
+TERMINALS:
+NAME	NUMBER	STRING	NEWLINE	ENDMARKER	INDENT	DEDENT	"def"	":"	"("	")"	"="	","	"*"	"**"	";"	"+="	"-="	"*="	"/="	"%="	"&="	"|="	"^="	"<<="	">>="	"**="	"//="	"print"	">>"	"del"	"pass"	"break"	"continue"	"return"	"yield"	"raise"	"import"	"from"	"."	"global"	"exec"	"in"	"assert"	"if"	"elif"	"else"	"while"	"for"	"try"	"finally"	"except"	"or"	"and"	"not"	"<"	">"	"=="	">="	"<="	"<>"	"!="	"is"	"|"	"^"	"&"	"<<"	"+"	"-"	"/"	"%"	"//"	"~"	"["	"]"	"{"	"}"	"`"	"lambda"	"class"	
+NON-TERMINALS:
+0: Start_symbols	-> single_input | file_input | eval_input
+1: single_input	-> NEWLINE | simple_stmt | compound_stmt NEWLINE
+2: file_input	-> {NEWLINE | stmt} ENDMARKER
+3: eval_input	-> testlist {NEWLINE} ENDMARKER
+4: simple_stmt	-> small_stmt {";" small_stmt} [";"] NEWLINE
+5: compound_stmt	-> if_stmt | while_stmt | for_stmt | try_stmt | funcdef | classdef
+6: stmt	-> simple_stmt | compound_stmt
+7: testlist	-> test {"," test} [","]
+8: funcdef	-> "def" NAME parameters ":" suite
+9: parameters	-> "(" [varargslist] ")"
+10: suite	-> simple_stmt | NEWLINE INDENT stmt {stmt} DEDENT
+11: varargslist	-> {fpdef ["=" test] ","} "*" NAME ["," "**" NAME] | "**" NAME | fpdef ["=" test] {"," fpdef ["=" test]} [","]
+12: fpdef	-> NAME | "(" fplist ")"
+13: test	-> and_test {"or" and_test} | lambdef
+14: fplist	-> fpdef {"," fpdef} [","]
+15: small_stmt	-> expr_stmt | print_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | exec_stmt | assert_stmt
+16: expr_stmt	-> testlist {augassign testlist | "=" testlist}
+17: print_stmt	-> "print" [test {"," test} [","]] | ">>" test ["," test {"," test} [","]]
+18: del_stmt	-> "del" exprlist
+19: pass_stmt	-> "pass"
+20: flow_stmt	-> break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt
+21: import_stmt	-> "import" dotted_as_name {"," dotted_as_name} | "from" dotted_name "import" "*" | import_as_name {"," import_as_name}
+22: global_stmt	-> "global" NAME {"," NAME}
+23: exec_stmt	-> "exec" expr ["in" test ["," test]]
+24: assert_stmt	-> "assert" test ["," test]
+25: augassign	-> "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "**=" | "//="
+26: exprlist	-> expr {"," expr} [","]
+27: break_stmt	-> "break"
+28: continue_stmt	-> "continue"
+29: return_stmt	-> "return" [testlist]
+30: raise_stmt	-> "raise" [test ["," test ["," test]]]
+31: yield_stmt	-> "yield" testlist
+32: dotted_as_name	-> dotted_name [NAME NAME]
+33: dotted_name	-> NAME {"." NAME}
+34: import_as_name	-> NAME [NAME NAME]
+35: expr	-> xor_expr {"|" xor_expr}
+36: if_stmt	-> "if" test ":" suite {"elif" test ":" suite} ["else" ":" suite]
+37: while_stmt	-> "while" test ":" suite ["else" ":" suite]
+38: for_stmt	-> "for" exprlist "in" testlist ":" suite ["else" ":" suite]
+39: try_stmt	-> "try" ":" suite except_clause ":" suite {except_clause ":" suite} ["else" ":" suite] | "try" ":" suite "finally" ":" suite
+40: classdef	-> "class" NAME ["(" testlist ")"] ":" suite
+41: except_clause	-> "except" [test ["," test]]
+42: and_test	-> not_test {"and" not_test}
+43: lambdef	-> "lambda" [varargslist] ":" test
+44: not_test	-> "not" not_test | comparison
+45: comparison	-> expr {comp_op expr}
+46: comp_op	-> "<" | ">" | "==" | ">=" | "<=" | "<>" | "!=" | "in" | "not" "in" | "is" | "is" "not"
+47: xor_expr	-> and_expr {"^" and_expr}
+48: and_expr	-> shift_expr {"&" shift_expr}
+49: shift_expr	-> arith_expr {"<<" | ">>" arith_expr}
+50: arith_expr	-> term {"+" | "-" term}
+51: term	-> factor {"*" | "/" | "%" | "//" factor}
+52: factor	-> "+" | "-" | "~" factor | power
+53: power	-> {atom trailer} {"**" factor}
+54: atom	-> "(" [testlist] ")" | "[" [listmaker] "]" | "{" [dictmaker] "}" | "`" testlist "`" | NAME | NUMBER | STRING {STRING}
+55: trailer	-> "(" [arglist] ")" | "[" subscriptlist "]" | "." NAME
+56: listmaker	-> test list_for | {"," test} [","]
+57: dictmaker	-> test ":" test {"," test ":" test} [","]
+58: list_for	-> "for" exprlist "in" testlist_safe [list_iter]
+59: arglist	-> {argument ","} argument [","] | "*" test ["," "**" test] | "**" test
+60: subscriptlist	-> subscript {"," subscript} [","]
+61: subscript	-> "." "." "." | test | [test] ":" [test] [sliceop]
+62: sliceop	-> ":" [test]
+63: testlist_safe	-> test ["," test {"," test} [","]]
+64: argument	-> [test "="] test
+65: list_iter	-> list_for | list_if
+66: list_if	-> "if" test [list_iter]
+>>> There are 80 terminals and 67 non-terminals 
+>>> Total McCabe complexity is: 228
+McCabe Metrics:
+   3   3   3   2   3   6   2   3   1   2   3  10   2   3   3   9   3   8   1   1
+   5   5   2   3   2  12   3   1   1   2   4   1   2   2   2   2   3   2   2   4
+   2   3   2   2   2   2  11   2   2   3   3   5   4   3  11   4   4   3   2   6
+   3   6   2   4   2   2   2
+>>> Total Halstead volume is: 52331.4
+>>> Average RHS Size is: 5.46269
+GRAMMATICAL LEVELS:
+DERIVES-IN-ONE RELATION
+  0:  ***                                                               
+  1:     **                                                             
+  2:       *                                                            
+  3:        *                                                           
+  4:                *                                                   
+  5:         *                           *****                          
+  6:     **                                                             
+  7:              *                                                     
+  8:          **                                                        
+  9:            *                                                       
+ 10:     * *                                                            
+ 11:             **                                                     
+ 12:               *                                                    
+ 13:                                           **                       
+ 14:             *                                                      
+ 15:                 *********                                          
+ 16:        *                 *                                         
+ 17:              *                                                     
+ 18:                           *                                        
+ 19:                                                                    
+ 20:                            *****                                   
+ 21:                                 ***                                
+ 22:                                                                    
+ 23:              *                     *                               
+ 24:              *                                                     
+ 25:                                                                    
+ 26:                                    *                               
+ 27:                                                                    
+ 28:                                                                    
+ 29:        *                                                           
+ 30:              *                                                     
+ 31:        *                                                           
+ 32:                                  *                                 
+ 33:                                                                    
+ 34:                                                                    
+ 35:                                                *                   
+ 36:           *  *                                                     
+ 37:           *  *                                                     
+ 38:        *  *               *                                        
+ 39:           *                              *                         
+ 40:        *  *                                                        
+ 41:              *                                                     
+ 42:                                             *                      
+ 43:            * *                                                     
+ 44:                                             **                     
+ 45:                                    *          *                    
+ 46:                                                                    
+ 47:                                                 *                  
+ 48:                                                  *                 
+ 49:                                                   *                
+ 50:                                                    *               
+ 51:                                                     *              
+ 52:                                                     **             
+ 53:                                                     * **           
+ 54:        *                                                **         
+ 55:                                                            **      
+ 56:              *                                            *        
+ 57:              *                                                     
+ 58:                           *                                    * * 
+ 59:              *                                                  *  
+ 60:                                                              *     
+ 61:              *                                                *    
+ 62:              *                                                     
+ 63:              *                                                     
+ 64:              *                                                     
+ 65:                                                           *       *
+ 66:              *                                                   * 
+DERIVES-IN-MANY RELATION
+  0:  ******************************************************************
+  1:     ***************************************************************
+  2:     ***************************************************************
+  3:        *   ****           *        *      *************************
+  4:        *   *************************      *************************
+  5:     ***************************************************************
+  6:     ***************************************************************
+  7:        *   ****           *        *      *************************
+  8:     ***************************************************************
+  9:        *   ****           *        *      *************************
+ 10:     ***************************************************************
+ 11:        *   ****           *        *      *************************
+ 12:             * *                                                    
+ 13:        *   ****           *        *      *************************
+ 14:             * *                                                    
+ 15:        *   **** ********************      *************************
+ 16:        *   ****          **        *      *************************
+ 17:        *   ****           *        *      *************************
+ 18:        *   ****           *        *      *************************
+ 19:                                                                    
+ 20:        *   ****           ******   *      *************************
+ 21:                                 ***                                
+ 22:                                                                    
+ 23:        *   ****           *        *      *************************
+ 24:        *   ****           *        *      *************************
+ 25:                                                                    
+ 26:        *   ****           *        *      *************************
+ 27:                                                                    
+ 28:                                                                    
+ 29:        *   ****           *        *      *************************
+ 30:        *   ****           *        *      *************************
+ 31:        *   ****           *        *      *************************
+ 32:                                  *                                 
+ 33:                                                                    
+ 34:                                                                    
+ 35:        *   ****           *        *      *************************
+ 36:     ***************************************************************
+ 37:     ***************************************************************
+ 38:     ***************************************************************
+ 39:     ***************************************************************
+ 40:     ***************************************************************
+ 41:        *   ****           *        *      *************************
+ 42:        *   ****           *        *      *************************
+ 43:        *   ****           *        *      *************************
+ 44:        *   ****           *        *      *************************
+ 45:        *   ****           *        *      *************************
+ 46:                                                                    
+ 47:        *   ****           *        *      *************************
+ 48:        *   ****           *        *      *************************
+ 49:        *   ****           *        *      *************************
+ 50:        *   ****           *        *      *************************
+ 51:        *   ****           *        *      *************************
+ 52:        *   ****           *        *      *************************
+ 53:        *   ****           *        *      *************************
+ 54:        *   ****           *        *      *************************
+ 55:        *   ****           *        *      *************************
+ 56:        *   ****           *        *      *************************
+ 57:        *   ****           *        *      *************************
+ 58:        *   ****           *        *      *************************
+ 59:        *   ****           *        *      *************************
+ 60:        *   ****           *        *      *************************
+ 61:        *   ****           *        *      *************************
+ 62:        *   ****           *        *      *************************
+ 63:        *   ****           *        *      *************************
+ 64:        *   ****           *        *      *************************
+ 65:        *   ****           *        *      *************************
+ 66:        *   ****           *        *      *************************
+Fenton impurity is: 0.949796
+>>> Fenton closed impurity is: 47.7502
+Class #5: (size = 9) 
+	compound_stmt	stmt	funcdef	suite	if_stmt	while_stmt	for_stmt
+	try_stmt	classdef
+Class #6: (size = 29) 
+	testlist	varargslist	test	exprlist	expr	and_test	lambdef
+	not_test	comparison	xor_expr	and_expr	shift_expr	arith_expr	term
+	factor	power	atom	trailer	listmaker	dictmaker	list_for
+	arglist	subscriptlist	subscript	sliceop	testlist_safe	argument	list_iter
+	list_if
+Class #8: (size = 2) 
+	fpdef	fplist
+>>> There are 30 equivalence classes, 3 of which are non-singleton
+As a percentage of the number of non-terminals, there are 44.8% equivalence classes 
+>>> (Depth) Largest equivalence class has 29 non-terminals
+Varju height metric is: 30
+EQUIVALENCE GRAPH (size 30)
+0:  *****************************
+1:     **************************
+2:     **************************
+3:       * *                    *
+4:       * ******************** *
+5:     * ************************
+6:         *                    *
+7:       * *                    *
+8:                               
+9:       * * ****************** *
+10:       * *          *         *
+11:       * *                    *
+12:       * *                    *
+13:                               
+14:       * *           *****    *
+15:                          ***  
+16:                               
+17:       * *                    *
+18:       * *                    *
+19:                               
+20:                               
+21:                               
+22:       * *                    *
+23:       * *                    *
+24:       * *                    *
+25:                           *   
+26:                               
+27:                               
+28:       * *                    *
+29:                               
