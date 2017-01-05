@@ -1,13 +1,14 @@
 # SynQ: SYNtactic Quantification of grammar complexity.
 
 Copyright 2004 
-  # James F. Power, NUI Maynooth, Ireland <jpower@cs.nuim.ie>
-  # Brian A. Malloy, Clemson University, Sc, USA <malloy@cs.clemson.edu>
+* James F. Power, NUI Maynooth, Ireland <jpower@cs.nuim.ie>
+* Brian A. Malloy, Clemson University, Sc, USA <malloy@cs.clemson.edu>
+
 Released under the GNU General Public License.
 
 This version last edited on 16 August 2004, 
-  # with minor corrections on 09 July 2005.
-  # updated Dec 2016, fixes to impurity and McCabe metrics.
+* with minor corrections on 09 July 2005.
+* updated Dec 2016, fixes to impurity and McCabe metrics.
 
 ## BUILD:
 
