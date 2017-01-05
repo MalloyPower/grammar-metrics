@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SRC_DIR=../src
-PARSER_DIR=../grammars/parsers
+PARSER_DIR=../grammars/cpp-parsers
 GRAMMAR_DIR=../grammars/standards
 
 SYNQ=${SRC_DIR}/synq
