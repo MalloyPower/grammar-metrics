@@ -1,6 +1,6 @@
 # SynQ: SYNtactic Quantification of grammar complexity.
 
-Copyright 2004 
+Copyright 2004-2016
 * James F. Power, NUI Maynooth, Ireland <jpower@cs.nuim.ie>
 * Brian A. Malloy, Clemson University, SC, USA <malloy@cs.clemson.edu>
 
